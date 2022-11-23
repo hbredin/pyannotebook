@@ -5,6 +5,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 from .example import ExampleWidget
+from .annotation import AnnotationWidget
 from .rttm import load_rttm
 
 from ._version import __version__, version_info
