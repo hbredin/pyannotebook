@@ -25,7 +25,7 @@ class AnnotationWidget(ipywidgets.Widget):
     widget.annotation = annotation
 
     # reset widget
-    widget.annotation = None
+    del widget.annotation
 
     Traitlets
     ---------
@@ -38,12 +38,41 @@ class AnnotationWidget(ipywidgets.Widget):
 
     def __init__(self, annotation: Optional[Annotation] = None):
         super().__init__()
-        self.annotation = annotation
+        if annotation:
+            self.annotation = annotation
     
     def _get_annotation(self):
         return get_annotation(self.regions, self.labels)
 
-    annotation = property(_get_annotation)
+    def _set_annotation(self, annotation: Annotation):
+
+        # rename tracks if they are not unique
+        tracks = [track for _, track in annotation.itertracks()]
+        if len(tracks) > len(set(tracks)):
+            annotation = annotation.relabel_tracks()
+
+        added_labels = set(annotation.labels()) - set(self.labels.values())
+        if added_labels:
+            new_labels = dict(self.labels)
+            index_pool = filterfalse(lambda i: i in self.labels, count(start=0))
+            for label in added_labels:
+                index = next(index_pool)
+                new_labels[index] = label
+            self.labels = new_labels
+        
+        self.regions = [
+            {
+                "start": segment.start, 
+                "end": segment.end, 
+                "label": self.slebal[label],
+                "id": track if track.startswith("wavesurfer_") else "frompython_" + "".join(random.choices(string.ascii_lowercase, k=11))
+            } for segment, track, label in annotation.itertracks(yield_label=True)]
+
+    def _del_annotation(self):
+        self.regions = list()
+        self.labels = dict()
+    
+    annotation = property(_get_annotation, _set_annotation, _del_annotation)
 
     @traitlets.observe("labels")
     def labels_has_changed(self, change: Dict):
@@ -58,26 +87,5 @@ class AnnotationWidget(ipywidgets.Widget):
                 new_labels[label] = label
             self.labels = new_labels
 
-    # def _set_annotation(self, annotation: Union[Annotation, None]):
 
-    #     if annotation is None:
-    #         annotation = Annotation()
-    #         self.labels = dict()
-        
-    #     else:
-    #         added_labels = set(annotation.labels()) - set(self.labels.values())
-    #         if added_labels:
-    #             new_labels = dict(self.labels)
-    #             index_pool = filterfalse(lambda i: i in self.labels, count(start=1))
-    #             for label in added_labels:
-    #                 index = next(index_pool)
-    #                 new_labels[index] = label
-    #             self.labels = new_labels
-        
-    #     self.regions = [
-    #         {
-    #             "start": segment.start, 
-    #             "end": segment.end, 
-    #             "label": self.slebal[label],
-    #             "id": "".join(random.choices(string.ascii_lowercase, k=20))
-    #         } for segment, _, label in annotation.itertracks(yield_label=True)]
+
