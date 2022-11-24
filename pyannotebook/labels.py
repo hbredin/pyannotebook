@@ -38,6 +38,7 @@ class LabelsWidget(ipywidgets.Widget):
 
 
     labels = traitlets.Dict().tag(sync=True)
+    active_label = traitlets.Int().tag(sync=True)
     colors = traitlets.Dict().tag(sync=True)
 
     def __init__(self):
