@@ -33,7 +33,11 @@ classifiers = [
 ]
 dependencies = [
     "ipywidgets>=7.0.0",
+    "ipyevents>=2.0.1",
+    "soundfile>=0.11.0",
     "pyannote.core>=4.5",
+    "networkx>=2.0.0",
+    "scipy>=1.0.0",
 ]
 version = "0.1.0.dev0"
 

@@ -4,6 +4,7 @@
 # Copyright (c) Hervé Bredin.
 # Distributed under the terms of the Modified BSD License.
 
+from .wavesurfer import WavesurferWidget
 from .annotation import AnnotationWidget
 from .labels import LabelsWidget
 from .rttm import load_rttm
