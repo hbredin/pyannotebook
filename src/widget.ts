@@ -364,6 +364,7 @@ export class LabelsView extends DOMWidgetView {
 
       var label = document.createElement('input');
       label.value = labels[idx];
+      label.addEventListener("keypress", this.save_label_on_enter(label, idx));
       button.appendChild(label);
       button.addEventListener("click", this.activate(idx)); 
       this.container.appendChild(button);
@@ -378,24 +379,24 @@ export class LabelsView extends DOMWidgetView {
     };
   };
 
-  // save_label_on_enter(label: HTMLInputElement, idx: string) {
+  save_label_on_enter(label: HTMLInputElement, idx: string) {
 
-  //   return (event: any) => {
-  //     if (event.key === "Enter") {
-  //       event.preventDefault();
-  //       var new_labels = Object();
-  //       var old_labels = this.model.get('labels');
-  //       for (const i in old_labels) {
-  //         if (i == idx) {
-  //           console.log(typeof(i));
-  //           new_labels[i] = label.value;
-  //         } else {
-  //           new_labels[i] = old_labels[i];
-  //         }
-  //       }
-  //       this.model.set('labels', new_labels);
-  //       this.touch();
-  //     }
-  //   }
-  // }
+    return (event: any) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        var new_labels = Object();
+        var old_labels = this.model.get('labels');
+        for (const i in old_labels) {
+          if (i == idx) {
+            console.log(typeof(i));
+            new_labels[i] = label.value;
+          } else {
+            new_labels[i] = old_labels[i];
+          }
+        }
+        this.model.set('labels', new_labels);
+        this.touch();
+      }
+    }
+  }
 }
