@@ -24,8 +24,8 @@ class LabelsWidget(ipywidgets.Widget):
 
     Traitlets
     ---------
-    labels : int -> human-readable
-    colors : int -> color
+    labels : str -> human-readable
+    colors : str -> color
 
     """
 
@@ -36,9 +36,8 @@ class LabelsWidget(ipywidgets.Widget):
     _view_module = traitlets.Unicode(module_name).tag(sync=True)
     _view_module_version = traitlets.Unicode(module_version).tag(sync=True)
 
-
     labels = traitlets.Dict().tag(sync=True)
-    active_label = traitlets.Int().tag(sync=True)
+    active_label = traitlets.Unicode("a").tag(sync=True)
     colors = traitlets.Dict().tag(sync=True)
 
     def __init__(self):

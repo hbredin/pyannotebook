@@ -50,7 +50,7 @@ class WavesurferWidget(DOMWidget):
 
     labels = traitlets.Dict().tag(sync=True)
     colors = traitlets.Dict().tag(sync=True)
-    active_label = traitlets.Int(1).tag(sync=True)
+    active_label = traitlets.Unicode("A").tag(sync=True)
 
     playing = traitlets.Bool(False).tag(sync=True)
     time = traitlets.Float(0.0).tag(sync=True)
@@ -149,10 +149,9 @@ class WavesurferWidget(DOMWidget):
         elif key == "Escape":
             self.active_region = ""
 
-        # [ digit n ] assigns label n to currently active region
-        # [ shift + digit n ] assigns label n + 10 to currently active region
-        elif code.startswith("Digit"):
-            self.active_label = int(code[5:]) + shift * 10
+        # [ letter ] assigns label letter to currently active region
+        elif key in string.ascii_lowercase:
+            self.active_label = key
             if self.active_region:
                 regions = list()
                 for region in self.regions:

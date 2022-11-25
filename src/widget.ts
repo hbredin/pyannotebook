@@ -349,28 +349,21 @@ export class LabelsView extends DOMWidgetView {
       var button = document.createElement('button');
       button.style.backgroundColor = colors[idx];
       button.classList.add('label-button');
+      if (idx == active_label) {
+        button.classList.add('label-button-active');
+      }
 
       var shortcut = document.createElement('span');
       shortcut.style.backgroundColor = "white";
       shortcut.classList.add('label-shortcut');
-
       if (idx == active_label) {
-        button.classList.add('label-button-active');
         shortcut.classList.add('label-button-active');
       }
-
-      var i = parseInt(idx);
-      if (i < 10) {
-        shortcut.textContent = idx;
-      } else {
-        if (i < 20) {
-          shortcut.innerHTML = "&#8679;" + (i % 10);
-        }
-      }
+      shortcut.textContent = idx.toUpperCase();
       button.appendChild(shortcut);
 
-      var label = document.createElement('span');
-      label.textContent = labels[idx];
+      var label = document.createElement('input');
+      label.value = labels[idx];
       button.appendChild(label);
       button.addEventListener("click", this.activate(idx)); 
       this.container.appendChild(button);
@@ -380,9 +373,29 @@ export class LabelsView extends DOMWidgetView {
   activate(idx: string) {
     var that = this;
     return function(event: any) {
-      that.model.set('active_label', parseInt(idx));
+      that.model.set('active_label', idx);
       that.touch();
     };
   };
 
+  // save_label_on_enter(label: HTMLInputElement, idx: string) {
+
+  //   return (event: any) => {
+  //     if (event.key === "Enter") {
+  //       event.preventDefault();
+  //       var new_labels = Object();
+  //       var old_labels = this.model.get('labels');
+  //       for (const i in old_labels) {
+  //         if (i == idx) {
+  //           console.log(typeof(i));
+  //           new_labels[i] = label.value;
+  //         } else {
+  //           new_labels[i] = old_labels[i];
+  //         }
+  //       }
+  //       this.model.set('labels', new_labels);
+  //       this.touch();
+  //     }
+  //   }
+  // }
 }

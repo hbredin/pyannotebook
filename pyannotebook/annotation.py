@@ -1,11 +1,11 @@
 import ipywidgets
 import traitlets
-from typing import Dict, Optional, Union
+from typing import Dict, Optional
 from pyannote.core import Annotation, Segment
+from pyannote.core.utils.generators import string_generator
 from itertools import filterfalse, count
 import random
 import string
-from functools import partial
 
 def get_annotation(regions, labels):
     annotation = Annotation()
@@ -29,8 +29,8 @@ class AnnotationWidget(ipywidgets.Widget):
 
     Traitlets
     ---------
-    labels : int -> human-readable
-    regions : list of {"start": float, "end": float, "id": str, "label": int}
+    labels : str -> human-readable
+    regions : list of {"start": float, "end": float, "id": str, "label": str}
     """
 
     labels = traitlets.Dict().tag(sync=True)
@@ -54,9 +54,10 @@ class AnnotationWidget(ipywidgets.Widget):
         added_labels = set(annotation.labels()) - set(self.labels.values())
         if added_labels:
             new_labels = dict(self.labels)
-            index_pool = filterfalse(lambda i: i in self.labels, count(start=0))
+            # index_pool = filterfalse(lambda i: i in self.labels, count(start=0))
+            index_pool = string_generator(skip=list(self.labels))
             for label in added_labels:
-                index = next(index_pool)
+                index = next(index_pool).lower()
                 new_labels[index] = label
             self.labels = new_labels
         
