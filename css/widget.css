@@ -88,3 +88,9 @@
   border-width: 1px;
   border-color: black;
 }
+
+.label-input {
+  background: transparent;
+  border-width: 0px;
+  border-style: solid;
+}

@@ -363,6 +363,7 @@ export class LabelsView extends DOMWidgetView {
       button.appendChild(shortcut);
 
       var label = document.createElement('input');
+      label.classList.add('label-input');
       label.value = labels[idx];
       label.addEventListener("keypress", this.save_label_on_enter(label, idx));
       button.appendChild(label);
