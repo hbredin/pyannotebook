@@ -332,20 +332,57 @@ export class LabelsView extends DOMWidgetView {
     this.container = document.createElement('div');
     this.el.appendChild(this.container);
 
-    this.labels_changed();
-    this.model.on('change:labels', this.labels_changed, this);
-    this.model.on('change:colors', this.labels_changed, this);
+    this.update_labels();
+    this.model.on('change:labels', this.update_labels, this);
+    this.model.on('change:colors', this.update_labels, this);
+    this.model.on('change:active_label', this.update_labels, this);
   }
 
-  labels_changed() {
+  update_labels() {
     var labels = this.model.get("labels");
     var colors = this.model.get("colors");
+    var active_label = this.model.get("active_label");
+
     this.container.textContent = "";
     for (const idx of Object.keys(labels)) {
+
       var button = document.createElement('button');
-      button.textContent = "[" + idx + "] " + labels[idx];
       button.style.backgroundColor = colors[idx];
+      button.classList.add('label-button');
+
+      var shortcut = document.createElement('span');
+      shortcut.style.backgroundColor = "white";
+      shortcut.classList.add('label-shortcut');
+
+      if (idx == active_label) {
+        button.classList.add('label-button-active');
+        shortcut.classList.add('label-button-active');
+      }
+
+      var i = parseInt(idx);
+      if (i < 10) {
+        shortcut.textContent = idx;
+      } else {
+        if (i < 20) {
+          shortcut.innerHTML = "&#8679;" + (i % 10);
+        }
+      }
+      button.appendChild(shortcut);
+
+      var label = document.createElement('span');
+      label.textContent = labels[idx];
+      button.appendChild(label);
+      button.addEventListener("click", this.activate(idx)); 
       this.container.appendChild(button);
     }
   }
+
+  activate(idx: string) {
+    var that = this;
+    return function(event: any) {
+      that.model.set('active_label', parseInt(idx));
+      that.touch();
+    };
+  };
+
 }

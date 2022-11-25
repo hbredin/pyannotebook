@@ -13,7 +13,6 @@
     #ffffff 15px
   );
   z-index: 1000 !important;
-  /* opacity: 100%; */
 }
 
 .wavesurfer-region-overlapping-1-1 {
@@ -64,4 +63,28 @@
 .wavesurfer-region-overlapping-4-4 {
   top: 40% !important;
   height: 50% !important;
+}
+
+.label-button {
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-width: 0px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.label-shortcut {
+  background-color: white;
+  /* margin-top: 5px; */
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-right: 5px;
+}
+
+.label-button-active {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
 }
