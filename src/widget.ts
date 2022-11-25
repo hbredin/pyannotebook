@@ -388,7 +388,6 @@ export class LabelsView extends DOMWidgetView {
         var old_labels = this.model.get('labels');
         for (const i in old_labels) {
           if (i == idx) {
-            console.log(typeof(i));
             new_labels[i] = label.value;
           } else {
             new_labels[i] = old_labels[i];
