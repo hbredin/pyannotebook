@@ -113,6 +113,20 @@ class WavesurferWidget(DOMWidget):
                     overlap[region_id] = {"level": color + 1, "num_levels": num_colors}
         self.overlap = overlap
 
+    @traitlets.observe("active_label")
+    def update_label(self, change: Dict):
+        active_label = change["new"]
+        if self.active_region and active_label:
+            regions = list()
+            for region in self.regions:
+                if region["id"] == self.active_region:
+                    regions.append({"start": region["start"], "end": region["end"], "id": region["id"], "label": self.active_label})
+                else:
+                    regions.append(region)
+            self.regions = regions
+
+
+
     def keyboard(self, event):
 
         # for debugging purposes...
@@ -149,17 +163,10 @@ class WavesurferWidget(DOMWidget):
         elif key == "Escape":
             self.active_region = ""
 
-        # [ letter ] assigns label letter to currently active region
+        # [ letter ] activates corresponding label
+        # side effect is to update the label of the currently active region
         elif key in string.ascii_lowercase:
             self.active_label = key
-            if self.active_region:
-                regions = list()
-                for region in self.regions:
-                    if region["id"] == self.active_region:
-                        regions.append({"start": region["start"], "end": region["end"], "id": region["id"], "label": self.active_label})
-                    else:
-                        regions.append(region)
-                self.regions = regions
 
         # When no region is active:
         # [ left  ] moves cursor to the left
