@@ -51,11 +51,11 @@ export class WavesurferView extends DOMWidgetView {
   to_blob(b64: string) {
     // https://stackoverflow.com/questions/27980612/converting-base64-to-blob-in-javascript
     // https://ionic.io/blog/converting-a-base64-string-to-a-blob-in-javascript
-    var byteString = atob(b64.split(',')[1]);
-    var ab = new ArrayBuffer(byteString.length);
-    var ia = new Uint8Array(ab);
+    const byteString = atob(b64.split(',')[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
 
-    for (var i = 0; i < byteString.length; i++) {
+    for (let i = 0; i < byteString.length; i++) {
       ia[i] = byteString.charCodeAt(i);
     }
     return new Blob([ab], { type: 'audio/x-wav' });
@@ -94,7 +94,7 @@ export class WavesurferView extends DOMWidgetView {
           container: this.wavesurfer_minimap,
           waveColor: '#777',
           progressColor: '#222',
-          height: 20
+          height: 20,
         }),
       ],
     });
@@ -124,7 +124,7 @@ export class WavesurferView extends DOMWidgetView {
   push_regions() {
     const regions = this._wavesurfer.regions.list;
     const region_ids = Object.keys(regions);
-    var _regions = [];
+    const _regions = [];
     for (const region_id of region_ids) {
       const region = regions[region_id];
       _regions.push({
@@ -142,13 +142,12 @@ export class WavesurferView extends DOMWidgetView {
   }
 
   update_audio() {
-    var blob = this.to_blob(this.model.get('audio'));
+    const blob = this.to_blob(this.model.get('audio'));
     this._wavesurfer.loadBlob(blob);
     this._wavesurfer.clearRegions();
   }
 
   update_regions() {
-
     if (this._syncing_regions) {
       return;
     }
@@ -163,8 +162,8 @@ export class WavesurferView extends DOMWidgetView {
         start: region.start,
         end: region.end,
         id: region.id,
-        attributes: {"label": region.label},
-      });      
+        attributes: { label: region.label },
+      });
     }
 
     this._adding_regions = false;
@@ -178,9 +177,9 @@ export class WavesurferView extends DOMWidgetView {
     const regions = this.model.get('regions');
     const colors = this.model.get('colors');
     const wavesurfer_regions = this._wavesurfer.regions.list;
-    
     for (const region of regions) {
-      wavesurfer_regions[region["id"]].element.style.backgroundColor = colors[region["label"]];
+      wavesurfer_regions[region['id']].element.style.backgroundColor =
+        colors[region['label']];
     }
   }
 
@@ -190,11 +189,14 @@ export class WavesurferView extends DOMWidgetView {
     const wavesurfer_regions = this._wavesurfer.regions.list;
 
     for (const region of regions) {
-      if (region["id"] == active_region) {
-        wavesurfer_regions[region["id"]].element.classList.add('wavesurfer-region-active');
-      } 
-      else {
-        wavesurfer_regions[region["id"]].element.classList.remove('wavesurfer-region-active');
+      if (region['id'] === active_region) {
+        wavesurfer_regions[region['id']].element.classList.add(
+          'wavesurfer-region-active'
+        );
+      } else {
+        wavesurfer_regions[region['id']].element.classList.remove(
+          'wavesurfer-region-active'
+        );
       }
     }
   }
@@ -205,15 +207,20 @@ export class WavesurferView extends DOMWidgetView {
     const wavesurfer_regions = this._wavesurfer.regions.list;
 
     for (const region of regions) {
-      var wavesurfer_region = wavesurfer_regions[region["id"]].element;
+      const wavesurfer_region = wavesurfer_regions[region['id']].element;
 
       for (const class_name of wavesurfer_region.className.split(' ')) {
-        if (class_name.startsWith("wavesurfer-region-overlapping")) {
+        if (class_name.startsWith('wavesurfer-region-overlapping')) {
           wavesurfer_region.classList.remove(class_name);
         }
       }
       if (region.id in overlap) {
-        wavesurfer_region.classList.add('wavesurfer-region-overlapping-' + overlap[region.id].level + '-' + overlap[region.id].num_levels);
+        wavesurfer_region.classList.add(
+          'wavesurfer-region-overlapping-' +
+            overlap[region.id].level +
+            '-' +
+            overlap[region.id].num_levels
+        );
       }
     }
   }
@@ -240,7 +247,7 @@ export class WavesurferView extends DOMWidgetView {
 
   // FIXME: find correct type for `created_region`
   on_region_created(created_region: any) {
-    var label;
+    let label;
     if ('label' in created_region.attributes) {
       label = created_region.attributes.label;
     } else {
@@ -248,8 +255,16 @@ export class WavesurferView extends DOMWidgetView {
       created_region.attributes.label = label;
     }
 
-    var l = created_region.element.appendChild(document.createElement('span'));
-    l.textContent = label;
+    const tag = document.createElement('span');
+    tag.textContent = label.toUpperCase();
+    tag.classList.add('wavesurfer-region-tag');
+
+    // TODO: replace by class with visible: off
+    const r = created_region.element;
+    r.appendChild(tag);
+    if (tag.getBoundingClientRect().width > r.clientWidth) {
+      r.removeChild(tag);
+    }
 
     if (!this._adding_regions) {
       this.model.set('active_region', created_region.id);
@@ -261,7 +276,7 @@ export class WavesurferView extends DOMWidgetView {
   on_region_update_end(updated_region: any) {
     const wavesurfer_regions = this._wavesurfer.regions.list;
     const region_ids = Object.keys(wavesurfer_regions);
-    var regions = [];
+    const regions = [];
     for (const region_id of region_ids) {
       const region = wavesurfer_regions[region_id];
       regions.push({
@@ -303,9 +318,9 @@ export class WavesurferView extends DOMWidgetView {
 
   // FIXME: find correct type for `region`
   on_region_click(region: any) {
-    var active_region;
-    if (region.id == this.model.get('active_region')) {
-      active_region = "";
+    let active_region;
+    if (region.id === this.model.get('active_region')) {
+      active_region = '';
     } else {
       active_region = region.id;
     }
@@ -314,7 +329,6 @@ export class WavesurferView extends DOMWidgetView {
     this.touch();
   }
 }
-
 
 export class LabelsModel extends DOMWidgetModel {
   defaults() {
@@ -356,56 +370,53 @@ export class LabelsView extends DOMWidgetView {
   }
 
   update_labels() {
-    var labels = this.model.get("labels");
-    var colors = this.model.get("colors");
-    var active_label = this.model.get("active_label");
+    const labels = this.model.get('labels');
+    const colors = this.model.get('colors');
+    const active_label = this.model.get('active_label');
 
-    this.container.textContent = "";
+    this.container.textContent = '';
     for (const idx of Object.keys(labels)) {
-
-      var button = document.createElement('button');
+      const button = document.createElement('button');
       button.style.backgroundColor = colors[idx];
       button.classList.add('label-button');
-      if (idx == active_label) {
+      if (idx === active_label) {
         button.classList.add('label-button-active');
       }
 
-      var shortcut = document.createElement('span');
-      shortcut.style.backgroundColor = "white";
+      const shortcut = document.createElement('span');
+      shortcut.style.backgroundColor = 'white';
       shortcut.classList.add('label-shortcut');
-      if (idx == active_label) {
+      if (idx === active_label) {
         shortcut.classList.add('label-button-active');
       }
       shortcut.textContent = idx.toUpperCase();
       button.appendChild(shortcut);
 
-      var label = document.createElement('input');
+      const label = document.createElement('input');
       label.classList.add('label-input');
       label.value = labels[idx];
-      label.addEventListener("keypress", this.save_label_on_enter(label, idx));
+      label.addEventListener('keypress', this.save_label_on_enter(label, idx));
       button.appendChild(label);
-      button.addEventListener("click", this.activate(idx)); 
+      button.addEventListener('click', this.activate(idx));
       this.container.appendChild(button);
     }
   }
 
   activate(idx: string) {
-    var that = this;
-    return function(event: any) {
-      that.model.set('active_label', idx);
-      that.touch();
+    return (event: any) => {
+      this.model.set('active_label', idx);
+      this.touch();
     };
-  };
+  }
 
   save_label_on_enter(label: HTMLInputElement, idx: string) {
-
     return (event: any) => {
-      if (event.key === "Enter") {
+      if (event.key === 'Enter') {
         event.preventDefault();
-        var new_labels = Object();
-        var old_labels = this.model.get('labels');
+        const new_labels = Object();
+        const old_labels = this.model.get('labels');
         for (const i in old_labels) {
-          if (i == idx) {
+          if (i === idx) {
             new_labels[i] = label.value;
           } else {
             new_labels[i] = old_labels[i];
@@ -414,6 +425,6 @@ export class LabelsView extends DOMWidgetView {
         this.model.set('labels', new_labels);
         this.touch();
       }
-    }
+    };
   }
 }
