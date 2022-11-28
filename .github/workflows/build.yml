@@ -38,13 +38,13 @@ jobs:
 
       - name: Linting
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        working-directory: jupyter-widget-testwidgets
+        working-directory: pyannotebook/src
         run: |
           yarn run lint:check
 
       - name: Check docs can be build + links
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        working-directory: jupyter-widget-testwidgets/docs
+        working-directory: pyannotebook/docs
         run: |
           sudo apt install -y pandoc
           make html
