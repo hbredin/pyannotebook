@@ -1,15 +1,16 @@
 
 # 🎹 pyannote + 🗒 notebook = pyannote**book**
 
-
 [![Build Status](https://travis-ci.org/pyannote/pyannotebook.svg?branch=master)](https://travis-ci.org/pyannote/pyannotebook)
 [![codecov](https://codecov.io/gh/pyannote/pyannotebook/branch/master/graph/badge.svg)](https://codecov.io/gh/pyannote/pyannotebook)
 
 pyannote**book** is a custom [Jupyter widget](https://ipywidgets.readthedocs.io/en/stable/) built on top of [pyannote.core](http://pyannote.github.io/pyannote-core/) and [wavesurfer.js](https://wavesurfer-js.org/).
 
-This is a work in progress: feedback and [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) welcome! 
+![pyannotebook screenshot](pyannotebook.png)
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/hbredin/pyannotebook/HEAD?labpath=examples%2Fintroduction.ipynb)
+This is a work in progress, try it here: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/hbredin/pyannotebook/HEAD?labpath=examples%2Fintroduction.ipynb)
+
+Feedback and [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) welcome! 
 
 ## Development Installation
 
