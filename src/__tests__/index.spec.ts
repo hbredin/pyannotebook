@@ -4,16 +4,16 @@
 // Add any needed widget imports here (or from controls)
 // import {} from '@jupyter-widgets/base';
 
-import { createTestModel } from './utils';
+// import { createTestModel } from './utils';
 
-import { WavesurferModel } from '..';
+// import { WavesurferModel } from '..';
 
-describe('Wavesurfer', () => {
-  describe('WavesurferModel', () => {
-    it('should be createable', () => {
-      const model = createTestModel(WavesurferModel);
-      expect(model).toBeInstanceOf(WavesurferModel);
-    });
+// describe('Wavesurfer', () => {
+//   describe('WavesurferModel', () => {
+//     it('should be createable', () => {
+//       const model = createTestModel(WavesurferModel);
+//       expect(model).toBeInstanceOf(WavesurferModel);
+//     });
 
-  });
-});
+//   });
+// });
