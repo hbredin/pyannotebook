@@ -1,5 +1,10 @@
-.wavesurfer-region {
+.wavesurfer-handle {
+  border-width: 1px;
   opacity: 50%;
+}
+
+.wavesurfer-region {
+  opacity: 80%;
   top: 10% !important;
   height: 80% !important;
 }
@@ -63,6 +68,12 @@
 .wavesurfer-region-overlapping-4-4 {
   top: 40% !important;
   height: 50% !important;
+}
+
+.wavesurfer-region-tag {
+  padding-left: 4px;
+  padding-top: 4px;
+  opacity: 100%;
 }
 
 .label-button {
