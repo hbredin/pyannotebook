@@ -1,25 +1,15 @@
 
-# pyannotebook
+# 🎹 pyannote + 🗒 notebook = pyannote**book**
+
 
 [![Build Status](https://travis-ci.org/pyannote/pyannotebook.svg?branch=master)](https://travis-ci.org/pyannote/pyannotebook)
 [![codecov](https://codecov.io/gh/pyannote/pyannotebook/branch/master/graph/badge.svg)](https://codecov.io/gh/pyannote/pyannotebook)
 
+pyannote**book** is a custom [Jupyter widget](https://ipywidgets.readthedocs.io/en/stable/) built on top of [pyannote.core](http://pyannote.github.io/pyannote-core/) and [wavesurfer.js](https://wavesurfer-js.org/).
 
-pyannote jupyter widget
+This is a work in progress: feedback and [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) welcome! 
 
-## Installation
-
-You can install using `pip`:
-
-```bash
-pip install pyannotebook
-```
-
-If you are using Jupyter Notebook 5.2 or earlier, you may also need to enable
-the nbextension:
-```bash
-jupyter nbextension enable --py [--sys-prefix|--user|--system] pyannotebook
-```
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/hbredin/pyannotebook/HEAD?labpath=examples%2Fintroduction.ipynb)
 
 ## Development Installation
 
