@@ -10,14 +10,12 @@
 
 describe('Dummy', () => {
   describe('Number', () => {
-    it('should be a number', () => {
+    it('should be one', () => {
       const number = 1;
-      expect(number).toBeInstanceOf(Number);
+      expect(number).toEqual(1);
     });
   });
 });
-
-
 
 // describe('Wavesurfer', () => {
 //   describe('WavesurferModel', () => {
