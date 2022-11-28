@@ -8,6 +8,17 @@
 
 // import { WavesurferModel } from '..';
 
+describe('Dummy', () => {
+  describe('Number', () => {
+    it('should be a number', () => {
+      const number = 1;
+      expect(number).toBeInstanceOf(Number);
+    });
+  });
+});
+
+
+
 // describe('Wavesurfer', () => {
 //   describe('WavesurferModel', () => {
 //     it('should be createable', () => {
