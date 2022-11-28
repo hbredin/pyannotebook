@@ -51,7 +51,7 @@ def load_rttm(rttm: Path, keep_type="SPEAKER") -> Dict[Text, Annotation]:
     """
     annotations = defaultdict(Annotation)
     letters = string.ascii_lowercase
-    with open("sample.rttm", "r") as rttm_file:
+    with open(rttm, "r") as rttm_file:
         rttm_reader = csv.reader(rttm_file, delimiter=' ')
         for l, line in enumerate(rttm_reader):
             main_type = line[0]
