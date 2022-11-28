@@ -13,6 +13,7 @@ import '../css/widget.css';
 
 import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/src/plugin/regions';
+import MinimapPlugin from 'wavesurfer.js/src/plugin/minimap';
 
 export class WavesurferModel extends DOMWidgetModel {
   defaults() {
@@ -42,6 +43,7 @@ export class WavesurferModel extends DOMWidgetModel {
 
 export class WavesurferView extends DOMWidgetView {
   private wavesurfer_container: HTMLDivElement;
+  private wavesurfer_minimap: HTMLDivElement;
   private _wavesurfer: WaveSurfer;
   private _adding_regions: boolean;
   private _syncing_regions: boolean;
@@ -60,7 +62,9 @@ export class WavesurferView extends DOMWidgetView {
   }
 
   render() {
+    this.wavesurfer_minimap = document.createElement('div');
     this.wavesurfer_container = document.createElement('div');
+    this.el.appendChild(this.wavesurfer_minimap);
     this.el.appendChild(this.wavesurfer_container);
 
     this._wavesurfer = WaveSurfer.create({
@@ -85,6 +89,12 @@ export class WavesurferView extends DOMWidgetView {
           formatTimeCallback: undefined,
           /** from container edges' Optional width for edgeScroll to start (default: 5% of viewport width). */
           edgeScrollWidth: undefined,
+        }),
+        MinimapPlugin.create({
+          container: this.wavesurfer_minimap,
+          waveColor: '#777',
+          progressColor: '#222',
+          height: 20
         }),
       ],
     });
