@@ -26,6 +26,7 @@ jobs:
           npm install -g codecov
       - name: Test the extension
         run: |
+          sudo apt install libsndfile1
           python -m pip install --upgrade -v -e ".[test, examples, docs]"
           python -m pytest
           yarn run test
