@@ -108,6 +108,7 @@ export class WavesurferView extends DOMWidgetView {
     this._wavesurfer.on('seek', this.on_seek.bind(this));
     this._wavesurfer.on('finish', this.on_finish.bind(this));
     this._wavesurfer.on('region-click', this.on_region_click.bind(this));
+    this._wavesurfer.on('zoom', this.on_zoom.bind(this));
 
     this.update_audio();
     this.model.on('change:audio', this.update_audio, this);
@@ -116,11 +117,8 @@ export class WavesurferView extends DOMWidgetView {
     this.model.on('change:overlap', this.update_overlap, this);
     this.model.on('change:playing', this.update_playing, this);
     this.model.on('change:time', this.update_time, this);
-    this.model.on(
-      'change:active_region',
-      this.update_active_region,
-      this
-    );
+    this.model.on('change:active_region', this.update_active_region, this);
+    this.model.on('change:zoom', this.update_zoom, this);
   }
 
   push_regions() {
@@ -234,6 +232,11 @@ export class WavesurferView extends DOMWidgetView {
     }
   }
 
+  update_zoom() {
+    const zoom = this.model.get('zoom');
+    this._wavesurfer.zoom(zoom);
+    this.update_colors();
+  }
 
   // FIXME: find correct type for `created_region`
   on_region_created(created_region: any) {
@@ -287,6 +290,10 @@ export class WavesurferView extends DOMWidgetView {
   on_seek(progress: number) {
     this.model.set('time', this._wavesurfer.getCurrentTime());
     this.touch();
+  }
+
+  on_zoom(minPxPerSec: number) {
+    console.log('minPxPerSec', minPxPerSec);
   }
 
   on_finish() {

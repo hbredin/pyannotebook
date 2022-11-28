@@ -54,6 +54,7 @@ class WavesurferWidget(DOMWidget):
 
     playing = traitlets.Bool(False).tag(sync=True)
     time = traitlets.Float(0.0).tag(sync=True)
+    zoom = traitlets.Int(20).tag(sync=True)
 
     regions = traitlets.List().tag(sync=True)
     active_region = traitlets.Unicode("").tag(sync=True)
@@ -201,6 +202,10 @@ class WavesurferWidget(DOMWidget):
                 self.playing = True
             else:
                 self.t += delta
+
+        elif key in {"ArrowUp", "ArrowDown"}:
+            direction = -1 if key == "ArrowDown" else 1
+            self.zoom = self.zoom + direction
 
         # [ backspace ] removes active region and activates the one on the left
         # [ delete ] removes active regions and activates the one on the right
