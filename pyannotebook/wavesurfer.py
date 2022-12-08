@@ -139,7 +139,14 @@ class WavesurferWidget(DOMWidget):
                     regions.append(region)
             self.regions = regions
 
-
+    @traitlets.observe("active_region")
+    def update_active_label(self, change: Dict):
+        """Set active_label to active_region label"""
+        active_region = change["new"]
+        for region in self.regions:
+            if region["id"] == active_region:
+                self.active_label = region["label"]
+                break
 
     def keyboard(self, event):
 
