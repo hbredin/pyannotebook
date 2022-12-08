@@ -98,6 +98,13 @@
   border-style: solid;
   border-width: 1px;
   border-color: black;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    #ffffff 10px,
+    #ffffff 15px
+  );
 }
 
 .label-input {
