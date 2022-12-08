@@ -190,6 +190,7 @@ export class WavesurferView extends DOMWidgetView {
     this.update_colors();
     this.update_active_region();
     this.update_overlap();
+    this.update_label_visibility();
   }
 
   update_colors() {
@@ -244,6 +245,27 @@ export class WavesurferView extends DOMWidgetView {
     }
   }
 
+  update_label_visibility() {
+    const regions = this.model.get('regions');
+    const wavesurfer_regions = this._wavesurfer.regions.list;
+
+    for (const region of regions) {
+      const wavesurfer_region = wavesurfer_regions[region['id']].element;
+      const tag = wavesurfer_region.querySelector(
+        '.wavesurfer-region-tag'
+      ) as HTMLElement | null;
+
+      if (tag !== null) {
+        tag.style.display = 'inline';
+        tag.style.display =
+          tag.getBoundingClientRect().width >
+          0.9 * wavesurfer_region.getBoundingClientRect().width
+            ? 'none'
+            : 'inline';
+      }
+    }
+  }
+
   update_playing() {
     if (this.model.get('playing')) {
       this._wavesurfer.play();
@@ -262,6 +284,7 @@ export class WavesurferView extends DOMWidgetView {
     const zoom = this.model.get('zoom');
     this._wavesurfer.zoom(zoom);
     this.update_colors();
+    this.update_label_visibility();
   }
 
   // FIXME: find correct type for `created_region`
@@ -278,12 +301,8 @@ export class WavesurferView extends DOMWidgetView {
     tag.textContent = label.toUpperCase();
     tag.classList.add('wavesurfer-region-tag');
 
-    // TODO: replace by class with visible: off
     const r = created_region.element;
     r.appendChild(tag);
-    if (tag.getBoundingClientRect().width > r.clientWidth) {
-      r.removeChild(tag);
-    }
 
     if (!this._adding_regions) {
       this.model.set('active_region', created_region.id);
@@ -314,6 +333,7 @@ export class WavesurferView extends DOMWidgetView {
     this.update_active_region();
     this.update_colors();
     this.update_overlap();
+    this.update_label_visibility();
   }
 
   on_audioprocess() {
@@ -328,6 +348,7 @@ export class WavesurferView extends DOMWidgetView {
 
   on_zoom(minPxPerSec: number) {
     console.log('minPxPerSec', minPxPerSec);
+    this.update_label_visibility();
   }
 
   on_finish() {
