@@ -88,6 +88,10 @@ export class WavesurferView extends DOMWidgetView {
 
     this._wavesurfer = WaveSurfer.create({
       container: this.wavesurfer_container,
+      barGap: 1,
+      barHeight: 1,
+      barRadius: 2,
+      barWidth: 2,
       scrollParent: true,
       plugins: [
         RegionsPlugin.create({
