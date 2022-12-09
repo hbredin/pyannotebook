@@ -178,11 +178,16 @@ class WavesurferWidget(DOMWidget):
         # [ tab ] selects next region and move cursor to its start time
         # [ shift + tab ] selects previous region and move cursor to its start time
         elif key == "Tab":
-            # FIXME: sort by end time when moving backward
-            regions = sorted(self.regions, key=lambda r: (r["start"], r["end"]))
             direction = -1 if shift else 1
+            # sort regions by start time (resp. end time) when going forward (resp. backward)
+            if direction > 0:
+                regions = sorted(self.regions, key=lambda r: (r["start"], r["end"]))
+            else:
+                regions = sorted(self.regions, key=lambda r: (r["end"], r["start"]))
+
             if not regions:
                 return
+            
             if self.active_region:
                 region_ids = [region["id"] for region in regions]
                 active_region = regions[
@@ -254,8 +259,13 @@ class WavesurferWidget(DOMWidget):
             if not self.active_region:
                 return
             direction = -1 if key == "Backspace" else 1
-            # FIXME: sort by end time when moving backward
-            regions = sorted(self.regions, key=lambda r: (r["start"], r["end"]))
+
+            # sort regions by start time (resp. end time) when going forward (resp. backward)
+            if direction > 0:
+                regions = sorted(self.regions, key=lambda r: (r["start"], r["end"]))
+            else:
+                regions = sorted(self.regions, key=lambda r: (r["end"], r["start"]))
+
             region_ids = [region["id"] for region in regions]
             active_region = regions[
                 (region_ids.index(self.active_region) + direction) % len(region_ids)
