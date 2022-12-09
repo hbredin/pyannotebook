@@ -106,19 +106,32 @@ class WavesurferWidget(DOMWidget):
     t = property(get_time, set_time)
 
     @traitlets.observe("regions")
-    def update_overlap_layout(self, change: Dict):
-        """Update regions overlap"""
+    def on_regions_change(self, change: Dict):
+        """
+        1. reset active region if it no longer exists
+        2. update regions overlap layout
+        """
+
+        # reset active region if it no longer exists
+        if self.active_region not in list(region["id"]for region in change["new"]):
+            self.active_region = ""
+
+        # convert regions to pyannote.core.Annotation
         annotation = get_annotation(self.regions, self.labels)
 
+        # compute overlap graph (one node per region, edges between overlapping regions)
         overlap_graph = nx.Graph()
         for (s1, t1), (s2, t2) in annotation.co_iter(annotation):
             overlap_graph.add_edge((s1, t1), (s2, t2))
 
+        # solve the graph coloring problem for each connected subgraph
+        # and use the solution for regions layout
         overlap = dict()
         for sub_graph in nx.connected_components(overlap_graph):
             sub_coloring = nx.coloring.greedy_color(
                 overlap_graph.subgraph(sorted(sub_graph))
             )
+
             num_colors = max(sub_coloring.values()) + 1
             for (_, region_id), color in sub_coloring.items():
                 if num_colors > 4:
