@@ -20,5 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-version_info = (0, 1, 0, 'dev')
+# version_info = (0, 1, 0, 'dev')
+version_info = (0, 1, 0)
 __version__ = ".".join(map(str, version_info))
