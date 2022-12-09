@@ -1,3 +1,6 @@
+> **Warning**
+> This is a work in progress... Feedback and [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) welcome!
+
 
 # 🎹 pyannote + 🗒 notebook = pyannote**book**
 
@@ -6,11 +9,19 @@
 
 pyannote**book** is a custom [Jupyter widget](https://ipywidgets.readthedocs.io/en/stable/) built on top of [pyannote.core](http://pyannote.github.io/pyannote-core/) and [wavesurfer.js](https://wavesurfer-js.org/).
 
-![pyannotebook screenshot](pyannotebook.png)
+It can be used to visualize and edit temporal audio labels. 
 
-This is a work in progress, try it here: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/hbredin/pyannotebook/HEAD?labpath=examples%2Fintroduction.ipynb)
+![](pyannotebook.png)
 
-Feedback and [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) welcome! 
+## Installation
+
+```bash
+pip install pyannotebook
+```
+
+## Documentation
+
+See this [notebook](examples/introduction.ipynb).
 
 ## Development Installation
 
