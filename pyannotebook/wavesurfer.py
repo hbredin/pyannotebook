@@ -175,8 +175,8 @@ class WavesurferWidget(DOMWidget):
         if key == " ":
             self.playing = not self.playing
 
-        # [ tab ] activates next region
-        # [ shift + tab ] activates previous region
+        # [ tab ] selects next region and move cursor to its start time
+        # [ shift + tab ] selects previous region and move cursor to its start time
         elif key == "Tab":
             # FIXME: sort by end time when moving backward
             regions = sorted(self.regions, key=lambda r: (r["start"], r["end"]))
@@ -185,13 +185,21 @@ class WavesurferWidget(DOMWidget):
                 return
             if self.active_region:
                 region_ids = [region["id"] for region in regions]
-                self.active_region = regions[
+                active_region = regions[
                     (region_ids.index(self.active_region) + direction)
                     % len(region_ids)
-                ]["id"]
+                ]
             else:
                 i = -1 if shift else 0
-                self.active_region = regions[i]["id"]
+                active_region = regions[i]
+
+            self.active_region = active_region["id"]
+
+            # move cursor to selected region start time
+            playing = self.playing
+            self.playing = False
+            self.time = active_region["start"]
+            self.playing = playing
 
         # [ esc ] deactivates all regions
         elif key == "Escape":
