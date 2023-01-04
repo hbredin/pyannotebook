@@ -29,7 +29,13 @@ from typing import Dict
 
 from pathlib import Path
 from typing import Tuple
-import soundfile as sf
+
+try:
+    import soundfile as sf
+    SOUNDFILE_IS_AVAILABLE = True
+except OSError as e:
+    SOUNDFILE_IS_AVAILABLE = False
+    print("Could not import `soundfile`: using `scipy.io.wavfile` instead, with limited audio file format support.")
 
 import networkx as nx
 import numpy as np
@@ -37,8 +43,6 @@ import base64
 import io
 import random
 import string
-
-# TODO: use soundfile in place of wavfile to remove one dependency
 import scipy.io.wavfile
 
 from .annotation import get_annotation
@@ -86,10 +90,14 @@ class WavesurferWidget(DOMWidget):
         self._keyboard.on_dom_event(self.keyboard)
 
     def to_base64(self, file: Path):
-        waveform, sample_rate = sf.read(file)
+        if SOUNDFILE_IS_AVAILABLE:
+            waveform, sample_rate = sf.read(file)
+        else:
+            sample_rate, waveform = scipy.io.wavfile.read(file)
+        waveform = waveform.astype(np.float32)
         waveform /= np.max(np.abs(waveform)) + 1e-8
         with io.BytesIO() as content:
-            scipy.io.wavfile.write(content, sample_rate, waveform.astype(np.float32))
+            scipy.io.wavfile.write(content, sample_rate, waveform)
             content.seek(0)
             b64 = base64.b64encode(content.read()).decode()
             b64 = f"data:audio/x-wav;base64,{b64}"
@@ -292,7 +300,6 @@ class WavesurferWidget(DOMWidget):
             self.active_region = region_id
 
 
-# https://github.com/jupyter-widgets/ipywidgets/blob/c5103e4084324dc80734fc14ceeafc973e13402f/docs/source/examples/Widget%20Custom.ipynb
 
 # keyboard shortcut ideas
 # https://support.prodi.gy/t/audio-ui-enhancement-keyboard-shortcuts-and-clickthrough/3412
