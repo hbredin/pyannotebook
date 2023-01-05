@@ -34,9 +34,9 @@ from pyannote.core import Annotation
 
 class Pyannotebook(ipywidgets.VBox):
 
-    def __init__(self, audio: Path, init: Optional[Annotation] = None):
+    def __init__(self, audio: Optional[Path] = None, init: Optional[Annotation] = None):
 
-        self._wavesurfer = WavesurferWidget(audio)
+        self._wavesurfer = WavesurferWidget(audio=audio)
         self._annotation = AnnotationWidget()
         self._labels = LabelsWidget()
         super().__init__([self._wavesurfer, self._labels])

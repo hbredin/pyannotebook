@@ -25,10 +25,9 @@ from ipywidgets import DOMWidget
 from ._frontend import module_name, module_version
 import traitlets
 from ipyevents import Event
-from typing import Dict
+from typing import Dict, Union, Tuple, Text, Optional
 
 from pathlib import Path
-from typing import Tuple
 
 try:
     import soundfile as sf
@@ -63,7 +62,7 @@ class WavesurferWidget(DOMWidget):
     _view_module = traitlets.Unicode(module_name).tag(sync=True)
     _view_module_version = traitlets.Unicode(module_version).tag(sync=True)
 
-    audio = traitlets.Unicode().tag(sync=True)
+    b64 = traitlets.Unicode().tag(sync=True)
 
     labels = traitlets.Dict().tag(sync=True)
     colors = traitlets.Dict().tag(sync=True)
@@ -78,30 +77,20 @@ class WavesurferWidget(DOMWidget):
 
     overlap = traitlets.Dict().tag(sync=True)
 
-    def __init__(self, file: Path, precision: Tuple[float, float] = (0.1, 0.5)):
+    def __init__(
+        self, 
+        audio: Optional[Union[Text, Path, Tuple[np.ndarray, int]]] = None, 
+        precision: Tuple[float, float] = (0.1, 0.5)
+    ):
+        
         super().__init__()
-        self.file = file
         self.precision = tuple(precision)
-        self.sample_rate = 16000
-        self.audio = self.to_base64(file)
+        if audio is not None:
+            self.audio = audio
 
         # keyboard shortcuts handler
         self._keyboard = Event(source=self, watched_events=["keydown"])
         self._keyboard.on_dom_event(self.keyboard)
-
-    def to_base64(self, file: Path):
-        if SOUNDFILE_IS_AVAILABLE:
-            waveform, sample_rate = sf.read(file)
-        else:
-            sample_rate, waveform = scipy.io.wavfile.read(file)
-        waveform = waveform.astype(np.float32)
-        waveform /= np.max(np.abs(waveform)) + 1e-8
-        with io.BytesIO() as content:
-            scipy.io.wavfile.write(content, sample_rate, waveform)
-            content.seek(0)
-            b64 = base64.b64encode(content.read()).decode()
-            b64 = f"data:audio/x-wav;base64,{b64}"
-        return b64
 
     def get_time(self):
         return self.time
@@ -111,7 +100,47 @@ class WavesurferWidget(DOMWidget):
             raise NotImplementedError("Setting time while playing is not supported.")
         self.time = max(0.0, time)
 
-    t = property(get_time, set_time)
+    t = property(get_time, set_time, None)
+
+    def set_audio(self, audio: Union[Text, Path, Tuple[np.ndarray, int]]):
+        """
+        
+        Usage
+        -----
+        wavesurfer.audio = "/path/to/audio.wav"
+        assert isinstance(waveform, )
+        wavesurfer.audio = (waveform, sample_rate)
+        
+        """
+
+        if isinstance(audio, (Path, Text)):
+            if SOUNDFILE_IS_AVAILABLE:
+                waveform, sample_rate = sf.read(audio)
+            else:
+                sample_rate, waveform = scipy.io.wavfile.read(audio)
+        else:
+            waveform, sample_rate = audio
+            assert isinstance(waveform, np.ndarray)
+            assert isinstance(sample_rate, int)
+            # TODO: check shape
+            # assert waveform.shape
+
+        waveform = waveform.astype(np.float32)
+        waveform /= np.max(np.abs(waveform)) + 1e-8
+
+        with io.BytesIO() as content:
+            scipy.io.wavfile.write(content, sample_rate, waveform)
+            content.seek(0)
+            b64 = base64.b64encode(content.read()).decode()
+            b64 = f"data:audio/x-wav;base64,{b64}"
+
+        self.b64 = b64
+
+    audio = property(None, set_audio, None)
+
+    @traitlets.observe("audio")
+    def on_audio_change(self, change: Dict):
+        self.regions = list()
 
     @traitlets.observe("regions")
     def on_regions_change(self, change: Dict):

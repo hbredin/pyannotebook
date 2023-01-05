@@ -133,8 +133,8 @@ export class WavesurferView extends DOMWidgetView {
     this._wavesurfer.on('region-click', this.on_region_click.bind(this));
     this._wavesurfer.on('zoom', this.on_zoom.bind(this));
 
-    this.update_audio();
-    this.model.on('change:audio', this.update_audio, this);
+    this.update_b64();
+    this.model.on('change:b64', this.update_b64, this);
     this.model.on('change:regions', this.update_regions, this);
     this.model.on('change:colors', this.update_colors, this);
     this.model.on('change:overlap', this.update_overlap, this);
@@ -164,8 +164,15 @@ export class WavesurferView extends DOMWidgetView {
     this._syncing_regions = false;
   }
 
-  update_audio() {
-    const blob = this.to_blob(this.model.get('audio'));
+  update_b64() {
+
+    console.log("update_b64");
+
+    const b64 = this.model.get('b64');
+    // TODO: check
+
+
+    const blob = this.to_blob(b64);
     this._wavesurfer.loadBlob(blob);
     this._wavesurfer.clearRegions();
   }
