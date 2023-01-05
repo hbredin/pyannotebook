@@ -25,10 +25,9 @@ from ipywidgets import DOMWidget
 from ._frontend import module_name, module_version
 import traitlets
 from ipyevents import Event
-from typing import Dict
+from typing import Dict, Tuple, Union, Text
 
 from pathlib import Path
-from typing import Tuple
 
 try:
     import soundfile as sf
@@ -63,7 +62,7 @@ class WavesurferWidget(DOMWidget):
     _view_module = traitlets.Unicode(module_name).tag(sync=True)
     _view_module_version = traitlets.Unicode(module_version).tag(sync=True)
 
-    audio = traitlets.Unicode().tag(sync=True)
+    b64 = traitlets.Unicode().tag(sync=True)
 
     labels = traitlets.Dict().tag(sync=True)
     colors = traitlets.Dict().tag(sync=True)
@@ -78,24 +77,17 @@ class WavesurferWidget(DOMWidget):
 
     overlap = traitlets.Dict().tag(sync=True)
 
-    def __init__(self, file: Path, precision: Tuple[float, float] = (0.1, 0.5)):
+    def __init__(self, file: Union[Text, Path, Tuple[np.ndarray, int]], precision: Tuple[float, float] = (0.1, 0.5)):
         super().__init__()
-        self.file = file
         self.precision = tuple(precision)
         self.sample_rate = 16000
-        self.audio = self.to_base64(file)
+        self.audio = file
 
         # keyboard shortcuts handler
         self._keyboard = Event(source=self, watched_events=["keydown"])
         self._keyboard.on_dom_event(self.keyboard)
 
-    def to_base64(self, file: Path):
-        if SOUNDFILE_IS_AVAILABLE:
-            waveform, sample_rate = sf.read(file)
-        else:
-            sample_rate, waveform = scipy.io.wavfile.read(file)
-        waveform = waveform.astype(np.float32)
-        waveform /= np.max(np.abs(waveform)) + 1e-8
+    def to_base64(self, waveform: np.ndarray, sample_rate: int) -> Text:
         with io.BytesIO() as content:
             scipy.io.wavfile.write(content, sample_rate, waveform)
             content.seek(0)
@@ -111,7 +103,27 @@ class WavesurferWidget(DOMWidget):
             raise NotImplementedError("Setting time while playing is not supported.")
         self.time = max(0.0, time)
 
-    t = property(get_time, set_time)
+    t = property(get_time, set_time, None)
+
+    def set_audio(self, file: Union[Text, Path, Tuple[np.ndarray, int]]):
+
+        if isinstance(file, (str, Path)):
+            if SOUNDFILE_IS_AVAILABLE:
+                waveform, sample_rate = sf.read(file)
+            else:
+                sample_rate, waveform = scipy.io.wavfile.read(file)
+
+        else:
+            waveform, sample_rate = file
+            assert isinstance(waveform, np.ndarray)
+            assert waveform.ndim == 1
+
+        waveform = waveform.astype(np.float32)
+        waveform /= np.max(np.abs(waveform)) + 1e-8
+
+        self.b64 = self.to_base64(waveform, sample_rate)
+
+    audio = property(None, set_audio, None)
 
     @traitlets.observe("regions")
     def on_regions_change(self, change: Dict):
