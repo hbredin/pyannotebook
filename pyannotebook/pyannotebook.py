@@ -27,17 +27,27 @@ from .wavesurfer import WavesurferWidget
 from .annotation import AnnotationWidget
 from .labels import LabelsWidget
 
-from typing import Optional, Union, Text, Tuple
-from pathlib import Path
-import numpy as np
+from typing import Optional
 from pyannote.core import Annotation
+
+try:
+    from pyannote.audio import Audio, Pipeline
+    from pyannote.audio.core.io import AudioFile
+    from pyannote.audio.pipelines.utils.hook import ProgressHook
+    PYANNOTE_AUDIO_AVAILABLE = True
+except ImportError:
+    PYANNOTE_AUDIO_AVAILABLE = False
 
 
 class Pyannotebook(ipywidgets.VBox):
 
-    def __init__(self, audio: Optional[Path] = None, init: Optional[Annotation] = None):
+    def __init__(
+        self, 
+        audio: Optional["AudioFile"] = None, 
+        pipeline: Optional["Pipeline"] = None
+    ):
 
-        self._wavesurfer = WavesurferWidget(audio=audio)
+        self._wavesurfer = WavesurferWidget()
         self._annotation = AnnotationWidget()
         self._labels = LabelsWidget()
         super().__init__([self._wavesurfer, self._labels])
@@ -46,9 +56,12 @@ class Pyannotebook(ipywidgets.VBox):
         ipywidgets.link((self._annotation, 'regions'), (self._wavesurfer, 'regions'))
         ipywidgets.link((self._labels, 'active_label'), (self._wavesurfer, 'active_label'))
         ipywidgets.link((self._labels, 'colors'), (self._wavesurfer, 'colors'))
-        if init:
-            self._annotation.annotation = init
-    
+        
+        self.pipeline = pipeline
+        
+        if audio is not None:
+            self.audio = audio
+                
     def _get_annotation(self) -> Annotation:
         return self._annotation.annotation
     
@@ -60,8 +73,23 @@ class Pyannotebook(ipywidgets.VBox):
 
     annotation = property(_get_annotation, _set_annotation, _del_annotation)
 
-    def _set_audio(self, audio: Optional[Union[Text, Path, Tuple[np.ndarray, int]]] = None):
-        self._wavesurfer.audio = audio
+    def _set_audio(self, file: "AudioFile"):
+
+        if PYANNOTE_AUDIO_AVAILABLE:
+            audio = Audio(mono=True)
+            file = audio.validate_file(file)
+            file["waveform"], file["sample_rate"] = audio(file)
+            self._wavesurfer.audio = (file["waveform"].numpy().squeeze(), file["sample_rate"])
+        else:
+            self._wavesurfer.audio = file
+
+        if self.pipeline is None:
+            return
+
+        # use progress hook to provide feedback
+        with ProgressHook() as hook:
+            annotation = self.pipeline(file, hook=hook)
+        self.annotation = annotation
 
     def _del_audio(self):
         del self._wavesurfer.audio
