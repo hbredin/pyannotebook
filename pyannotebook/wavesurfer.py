@@ -77,7 +77,11 @@ class WavesurferWidget(DOMWidget):
 
     overlap = traitlets.Dict().tag(sync=True)
 
-    def __init__(self, audio: Optional[Union[Text, Path, Tuple[np.ndarray, int]]] = None, precision: Tuple[float, float] = (0.1, 0.5)):
+    def __init__(
+        self, 
+        audio: Optional[Union[Text, Path, Tuple[np.ndarray, int]]] = None, 
+        precision: Tuple[float, float] = (0.1, 0.5),
+    ):
         super().__init__()
         self.precision = tuple(precision)
     
