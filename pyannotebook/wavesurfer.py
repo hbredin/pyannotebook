@@ -25,7 +25,7 @@ from ipywidgets import DOMWidget
 from ._frontend import module_name, module_version
 import traitlets
 from ipyevents import Event
-from typing import Dict, Tuple, Union, Text
+from typing import Dict, Tuple, Union, Text, Optional
 
 from pathlib import Path
 
@@ -77,11 +77,14 @@ class WavesurferWidget(DOMWidget):
 
     overlap = traitlets.Dict().tag(sync=True)
 
-    def __init__(self, file: Union[Text, Path, Tuple[np.ndarray, int]], precision: Tuple[float, float] = (0.1, 0.5)):
+    def __init__(self, audio: Optional[Union[Text, Path, Tuple[np.ndarray, int]]] = None, precision: Tuple[float, float] = (0.1, 0.5)):
         super().__init__()
         self.precision = tuple(precision)
-        self.sample_rate = 16000
-        self.audio = file
+    
+        if audio is None:
+            del self.audio
+        else:
+            self.audio = audio
 
         # keyboard shortcuts handler
         self._keyboard = Event(source=self, watched_events=["keydown"])
@@ -105,16 +108,16 @@ class WavesurferWidget(DOMWidget):
 
     t = property(get_time, set_time, None)
 
-    def set_audio(self, file: Union[Text, Path, Tuple[np.ndarray, int]]):
+    def set_audio(self, audio: Union[Text, Path, Tuple[np.ndarray, int]]):
 
-        if isinstance(file, (str, Path)):
+        if isinstance(audio, (str, Path)):
             if SOUNDFILE_IS_AVAILABLE:
-                waveform, sample_rate = sf.read(file)
+                waveform, sample_rate = sf.read(audio)
             else:
-                sample_rate, waveform = scipy.io.wavfile.read(file)
+                sample_rate, waveform = scipy.io.wavfile.read(audio)
 
         else:
-            waveform, sample_rate = file
+            waveform, sample_rate = audio
             assert isinstance(waveform, np.ndarray)
             assert waveform.ndim == 1
 
@@ -123,7 +126,16 @@ class WavesurferWidget(DOMWidget):
 
         self.b64 = self.to_base64(waveform, sample_rate)
 
-    audio = property(None, set_audio, None)
+    def del_audio(self):
+        sample_rate = 16000
+        waveform = np.zeros((sample_rate, ), dtype=np.float32)
+        self.audio = (waveform, sample_rate)
+
+    audio = property(None, set_audio, del_audio)
+
+    @traitlets.observe("b64")
+    def on_b64_change(self, change: Dict):
+        self.regions = list()
 
     @traitlets.observe("regions")
     def on_regions_change(self, change: Dict):

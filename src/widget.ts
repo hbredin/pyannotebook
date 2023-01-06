@@ -165,12 +165,14 @@ export class WavesurferView extends DOMWidgetView {
   }
 
   update_b64() {
-    const blob = this.to_blob(this.model.get('b64'));
+    const b64 = this.model.get('b64');
+    const blob = this.to_blob(b64);
     this._wavesurfer.loadBlob(blob);
-    this._wavesurfer.clearRegions();
+    this._wavesurfer.clearRegions();        
   }
 
   update_regions() {
+
     if (this._syncing_regions) {
       return;
     }

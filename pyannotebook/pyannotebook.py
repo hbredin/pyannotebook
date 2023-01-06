@@ -27,16 +27,17 @@ from .wavesurfer import WavesurferWidget
 from .annotation import AnnotationWidget
 from .labels import LabelsWidget
 
-from typing import Optional
+from typing import Optional, Union, Text, Tuple
 from pathlib import Path
+import numpy as np
 from pyannote.core import Annotation
 
 
 class Pyannotebook(ipywidgets.VBox):
 
-    def __init__(self, audio: Path, init: Optional[Annotation] = None):
+    def __init__(self, audio: Optional[Path] = None, init: Optional[Annotation] = None):
 
-        self._wavesurfer = WavesurferWidget(audio)
+        self._wavesurfer = WavesurferWidget(audio=audio)
         self._annotation = AnnotationWidget()
         self._labels = LabelsWidget()
         super().__init__([self._wavesurfer, self._labels])
@@ -58,3 +59,11 @@ class Pyannotebook(ipywidgets.VBox):
         del self._annotation.annotation
 
     annotation = property(_get_annotation, _set_annotation, _del_annotation)
+
+    def _set_audio(self, audio: Optional[Union[Text, Path, Tuple[np.ndarray, int]]] = None):
+        self._wavesurfer.audio = audio
+
+    def _del_audio(self):
+        del self._wavesurfer.audio
+
+    audio = property(None, _set_audio, _del_audio)
