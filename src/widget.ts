@@ -133,15 +133,22 @@ export class WavesurferView extends DOMWidgetView {
     this._wavesurfer.on('region-click', this.on_region_click.bind(this));
     this._wavesurfer.on('zoom', this.on_zoom.bind(this));
 
+    this._wavesurfer.on('ready', this.on_ready.bind(this));
+
     this.update_b64();
     this.model.on('change:b64', this.update_b64, this);
-    this.model.on('change:regions', this.update_regions, this);
+    // this.model.on('change:labels', this.update_colors, this);
     this.model.on('change:colors', this.update_colors, this);
-    this.model.on('change:overlap', this.update_overlap, this);
+    // this.model.on('change:active_label', ..., this);
+
     this.model.on('change:playing', this.update_playing, this);
     this.model.on('change:time', this.update_time, this);
-    this.model.on('change:active_region', this.update_active_region, this);
     this.model.on('change:zoom', this.update_zoom, this);
+
+    this.model.on('change:regions', this.update_regions, this);
+    this.model.on('change:active_region', this.update_active_region, this);
+
+    this.model.on('change:overlap', this.update_overlap, this);
   }
 
   push_regions() {
@@ -167,8 +174,8 @@ export class WavesurferView extends DOMWidgetView {
   update_b64() {
     const b64 = this.model.get('b64');
     const blob = this.to_blob(b64);
-    this._wavesurfer.loadBlob(blob);
     this._wavesurfer.clearRegions();
+    this._wavesurfer.loadBlob(blob);
   }
 
   update_regions() {
@@ -373,6 +380,16 @@ export class WavesurferView extends DOMWidgetView {
     this.model.set('active_region', active_region);
     this.touch();
   }
+
+  on_ready() {
+    this.update_active_region();
+    this.update_colors();
+    this.update_overlap();
+    this.update_label_visibility();
+  }
+
+
+
 }
 
 export class LabelsModel extends DOMWidgetModel {
