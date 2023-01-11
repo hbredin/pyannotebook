@@ -46,6 +46,14 @@ import scipy.io.wavfile
 
 from .annotation import get_annotation
 
+from itertools import filterfalse, tee
+
+def partition(pred, iterable):
+    "Use a predicate to partition entries into false entries and true entries"
+    # partition(is_odd, range(10)) --> 0 2 4 6 8   and  1 3 5 7 9
+    t1, t2 = tee(iterable)
+    return filterfalse(pred, t1), filter(pred, t2)
+
 
 class WavesurferWidget(DOMWidget):
     """wavesurfer.js widget
@@ -352,19 +360,57 @@ class WavesurferWidget(DOMWidget):
             self.regions = regions
 
         # [ enter ] creates a new region at current time
+        # [ shift + enter ] split selected region at current time
+
         elif key == "Enter":
-            regions = list(self.regions)
-            region_id = "".join(random.choices(string.ascii_lowercase, k=20))
-            regions.append({
-                "start": self.t,
-                "end": self.t + self.precision[1],
-                "id": region_id,
-                "label": self.active_label
-            })
-            self.regions = regions
-            self.active_region = region_id
 
+            if shift:
 
+                # check that a region is selected...
+                if not self.active_region:
+                    return
+
+                other_regions, selected_region = partition(lambda r: r["id"] == self.active_region, self.regions)
+                other_regions = list(other_regions)
+                selected_region = list(selected_region)[0]
+
+                # check that selected region contains current time
+                if self.t < selected_region["start"] or self.t > selected_region["end"]:
+                    return
+            
+                # split selected region into first and second halves  
+                first_half = {
+                    "start": selected_region["start"],
+                    "end": self.t,
+                    "id": selected_region["id"],
+                    "label": selected_region["label"]
+                }
+                region_id = "".join(random.choices(string.ascii_lowercase, k=20))
+                second_half = {
+                    "start": self.t,
+                    "end": selected_region["end"],
+                    "id": region_id,
+                    "label": selected_region["label"]
+                }
+                
+                # append to halves to list of regions
+                self.regions = other_regions + [first_half, second_half]
+
+                # selects second half
+                self.active_region = region_id
+
+            else:
+
+                regions = list(self.regions)
+                region_id = "".join(random.choices(string.ascii_lowercase, k=20))
+                regions.append({
+                    "start": self.t,
+                    "end": self.t + self.precision[1],
+                    "id": region_id,
+                    "label": self.active_label
+                })
+                self.regions = regions
+                self.active_region = region_id
 
 # keyboard shortcut ideas
 # https://support.prodi.gy/t/audio-ui-enhancement-keyboard-shortcuts-and-clickthrough/3412
