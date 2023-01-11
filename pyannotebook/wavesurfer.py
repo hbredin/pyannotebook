@@ -277,19 +277,19 @@ class WavesurferWidget(DOMWidget):
             self.time = active_region["start"]
             self.playing = playing
 
-        # [ esc ] deactivates all regions
+        # [ esc ] unselects all regions
         elif key == "Escape":
             self.active_region = ""
 
-        # [ letter ] activates corresponding label
-        # side effect is to update the label of the currently active region
+        # [ letter ] selects corresponding label
+        # side effect is to update the label of the currently selected region
         elif key in string.ascii_lowercase:
             self.active_label = key
 
-        # When no region is active:
+        # When no region is selected:
         # [ left  ] moves cursor to the left
         # [ right ] moves cursor to the right
-        # When a region is active:
+        # When a region is selected:
         # [ left  ] moves start time to the left
         # [ right ] moves start time to the right
         # [ left + alt  ] moves end time to the left
@@ -320,6 +320,8 @@ class WavesurferWidget(DOMWidget):
             else:
                 self.t += delta
 
+        # [ up ] zooms in
+        # [ down ] zooms out
         elif key in {"ArrowUp", "ArrowDown"}:
             direction = -1 if key == "ArrowDown" else 1
             self.zoom = self.zoom + direction
