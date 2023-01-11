@@ -63,6 +63,7 @@ class WavesurferWidget(DOMWidget):
     _view_module_version = traitlets.Unicode(module_version).tag(sync=True)
 
     b64 = traitlets.Unicode().tag(sync=True)
+    minimap = traitlets.Bool().tag(sync=True)
 
     labels = traitlets.Dict().tag(sync=True)
     colors = traitlets.Dict().tag(sync=True)
@@ -81,9 +82,11 @@ class WavesurferWidget(DOMWidget):
         self, 
         audio: Optional[Union[Text, Path, Tuple[np.ndarray, int]]] = None, 
         precision: Tuple[float, float] = (0.1, 0.5),
+        minimap: bool = True,
     ):
         super().__init__()
         self.precision = tuple(precision)
+        self.minimap = minimap
     
         if audio is None:
             del self.audio

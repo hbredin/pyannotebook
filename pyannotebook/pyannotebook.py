@@ -44,10 +44,11 @@ class Pyannotebook(ipywidgets.VBox):
     def __init__(
         self, 
         audio: Optional["AudioFile"] = None, 
-        pipeline: Optional["Pipeline"] = None
+        pipeline: Optional["Pipeline"] = None,
+        minimap: bool = True,
     ):
 
-        self._wavesurfer = WavesurferWidget()
+        self._wavesurfer = WavesurferWidget(minimap=minimap)
         self._annotation = AnnotationWidget()
         self._labels = LabelsWidget()
         super().__init__([self._wavesurfer, self._labels])

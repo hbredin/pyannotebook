@@ -81,10 +81,46 @@ export class WavesurferView extends DOMWidgetView {
   }
 
   render() {
-    this.wavesurfer_minimap = document.createElement('div');
+
+    const plugins = [];
+
+    const minimap = this.model.get('minimap');
+    if (minimap) {
+      this.wavesurfer_minimap = document.createElement('div');
+      this.el.appendChild(this.wavesurfer_minimap);
+      plugins.push(
+        MinimapPlugin.create({
+          container: this.wavesurfer_minimap,
+          waveColor: '#777',
+          progressColor: '#222',
+          height: 20,
+        })
+      );
+    }
+
     this.wavesurfer_container = document.createElement('div');
-    this.el.appendChild(this.wavesurfer_minimap);
     this.el.appendChild(this.wavesurfer_container);
+    plugins.push(
+      RegionsPlugin.create({
+        regionsMinLength: 0,
+        /** Enable creating regions by dragging with the mouse. */
+        dragSelection: true,
+        /** Regions that should be added upon initialisation. */
+        regions: undefined,
+        /** The sensitivity of the mouse dragging (default: 2). */
+        slop: 2,
+        /** Snap the regions to a grid of the specified multiples in seconds? */
+        snapToGridInterval: undefined,
+        /** Shift the snap-to-grid by the specified seconds. May also be negative. */
+        snapToGridOffset: undefined,
+        /** Maximum number of regions that may be created by the user at one time. */
+        maxRegions: undefined,
+        /** Allows custom formating for region tooltip. */
+        formatTimeCallback: undefined,
+        /** from container edges' Optional width for edgeScroll to start (default: 5% of viewport width). */
+        edgeScrollWidth: undefined,
+      })
+    );
 
     this._wavesurfer = WaveSurfer.create({
       container: this.wavesurfer_container,
@@ -93,33 +129,7 @@ export class WavesurferView extends DOMWidgetView {
       barRadius: 2,
       barWidth: 2,
       scrollParent: true,
-      plugins: [
-        RegionsPlugin.create({
-          regionsMinLength: 0,
-          /** Enable creating regions by dragging with the mouse. */
-          dragSelection: true,
-          /** Regions that should be added upon initialisation. */
-          regions: undefined,
-          /** The sensitivity of the mouse dragging (default: 2). */
-          slop: 2,
-          /** Snap the regions to a grid of the specified multiples in seconds? */
-          snapToGridInterval: undefined,
-          /** Shift the snap-to-grid by the specified seconds. May also be negative. */
-          snapToGridOffset: undefined,
-          /** Maximum number of regions that may be created by the user at one time. */
-          maxRegions: undefined,
-          /** Allows custom formating for region tooltip. */
-          formatTimeCallback: undefined,
-          /** from container edges' Optional width for edgeScroll to start (default: 5% of viewport width). */
-          edgeScrollWidth: undefined,
-        }),
-        MinimapPlugin.create({
-          container: this.wavesurfer_minimap,
-          waveColor: '#777',
-          progressColor: '#222',
-          height: 20,
-        }),
-      ],
+      plugins: plugins,
     });
 
     this._wavesurfer.on(
@@ -137,9 +147,7 @@ export class WavesurferView extends DOMWidgetView {
 
     this.update_b64();
     this.model.on('change:b64', this.update_b64, this);
-    // this.model.on('change:labels', this.update_colors, this);
     this.model.on('change:colors', this.update_colors, this);
-    // this.model.on('change:active_label', ..., this);
 
     this.model.on('change:playing', this.update_playing, this);
     this.model.on('change:time', this.update_time, this);
@@ -387,9 +395,6 @@ export class WavesurferView extends DOMWidgetView {
     this.update_overlap();
     this.update_label_visibility();
   }
-
-
-
 }
 
 export class LabelsModel extends DOMWidgetModel {
