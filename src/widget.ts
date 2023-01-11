@@ -394,6 +394,7 @@ export class WavesurferView extends DOMWidgetView {
     this.update_colors();
     this.update_overlap();
     this.update_label_visibility();
+    this.update_playing();
   }
 }
 
