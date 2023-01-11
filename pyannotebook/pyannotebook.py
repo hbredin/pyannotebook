@@ -44,12 +44,21 @@ class Pyannotebook(ipywidgets.VBox):
     
     Parameters
     ----------
+    audio : pyannote.audio.core.io.AudioFile, optional
+        Load provided audio file (using any pyannote.audio-compliant format).
+        Defaults to not load any audio.
+    pipeline : pyannote.audio.Pipeline, optional
+        Use pretrained pipeline for pre-annotation. 
+        Defaults to start annotating from scratch.
     minimap : bool, optional
         Display a minimap on top of waveform. Defaults to True.
     auto_select : bool, optional
         Automatically select region corresponding to current time.
         Defaults to False.
     
+    See also
+    --------
+    pyannote.audio.core.io.AudioFile
     """
 
     def __init__(
