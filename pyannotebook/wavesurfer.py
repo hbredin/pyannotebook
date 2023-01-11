@@ -50,6 +50,14 @@ from .annotation import get_annotation
 class WavesurferWidget(DOMWidget):
     """wavesurfer.js widget
     
+    Parameters
+    ----------
+    minimap : bool, optional
+        Display a minimap on top of waveform. Defaults to True.
+    auto_select : bool, optional
+        Automatically select region corresponding to current time.
+        Defaults to False.
+
     Usage
     -----
     widget = WavesurferWidget()
@@ -83,10 +91,12 @@ class WavesurferWidget(DOMWidget):
         audio: Optional[Union[Text, Path, Tuple[np.ndarray, int]]] = None, 
         precision: Tuple[float, float] = (0.1, 0.5),
         minimap: bool = True,
+        auto_select: bool = False,
     ):
         super().__init__()
         self.precision = tuple(precision)
         self.minimap = minimap
+        self.auto_select = auto_select
     
         if audio is None:
             del self.audio
@@ -143,6 +153,28 @@ class WavesurferWidget(DOMWidget):
     @traitlets.observe("b64")
     def on_b64_change(self, change: Dict):
         self.regions = list()
+
+    @traitlets.observe("time")
+    def on_time_change(self, change: Dict):
+        """Automatically select region corresponding to current time"""
+
+        # skip if auto_select is disabled or no region exists
+        if not (self.auto_select and self.regions):
+            return
+        
+        # read current time
+        current_time = change['new']
+        
+        # Gather list of regions overlapping current time
+        # because of Javascript/Python/wavesurfer.seek conversion, we allow a bit of tolerance on both sides.
+        # in particular, this avoids a corner case where Python side asks to seek to a region start time and
+        # Javascript/Wavesurfer side does not manage to seek to this exact time and ends up outside of the region.
+        overlapping_regions = list(filter(lambda r: r["start"] - 0.01 <= current_time <= r["end"] + 0.01, self.regions))
+        if not overlapping_regions:
+            return
+
+        # among every overlapping regions, select the one whose start time is the closest
+        self.active_region = min(overlapping_regions, key=lambda r: abs(r["start"] - current_time))["id"]
 
     @traitlets.observe("regions")
     def on_regions_change(self, change: Dict):

@@ -40,15 +40,30 @@ except ImportError:
 
 
 class Pyannotebook(ipywidgets.VBox):
+    """Notebook widget for audio annotation
+    
+    Parameters
+    ----------
+    minimap : bool, optional
+        Display a minimap on top of waveform. Defaults to True.
+    auto_select : bool, optional
+        Automatically select region corresponding to current time.
+        Defaults to False.
+    
+    """
 
     def __init__(
         self, 
         audio: Optional["AudioFile"] = None, 
         pipeline: Optional["Pipeline"] = None,
         minimap: bool = True,
+        auto_select: bool = False,
     ):
 
-        self._wavesurfer = WavesurferWidget(minimap=minimap)
+        self.minimap = minimap
+        self.auto_select = auto_select
+
+        self._wavesurfer = WavesurferWidget(minimap=self.minimap, auto_select=self.auto_select)
         self._annotation = AnnotationWidget()
         self._labels = LabelsWidget()
         super().__init__([self._wavesurfer, self._labels])
@@ -59,7 +74,6 @@ class Pyannotebook(ipywidgets.VBox):
         ipywidgets.link((self._labels, 'colors'), (self._wavesurfer, 'colors'))
         
         self.pipeline = pipeline
-        
         if audio is not None:
             self.audio = audio
                 
