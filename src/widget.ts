@@ -467,6 +467,11 @@ export class LabelsView extends DOMWidgetView {
       button.addEventListener('click', this.activate(idx));
       this.container.appendChild(button);
     }
+    const add_button = document.createElement('button');
+    add_button.textContent = '+';
+    add_button.classList.add('label-button');
+    add_button.addEventListener('click', this.add_label());
+    this.container.appendChild(add_button);
   }
 
   activate(idx: string) {
@@ -492,6 +497,29 @@ export class LabelsView extends DOMWidgetView {
         this.model.set('labels', new_labels);
         this.touch();
       }
+    };
+  }
+  add_label() {
+    return (event: any) => {
+      const new_labels = Object();
+      const old_labels = this.model.get('labels');
+      const old_colors = this.model.get('colors');
+      const new_idx = Object.keys(old_labels).length;
+      for (const i in old_labels) {
+        new_labels[i] = old_labels[i];
+      }
+      new_labels[new_idx] = 'New Label';
+      this.model.set('labels', new_labels);
+
+      const new_colors = Object();
+      for (const i in old_colors) {
+        new_colors[i] = old_colors[i];
+      }
+      new_colors[new_idx] = '#000000';
+      this.model.set('colors', new_colors);
+
+      this.model.set('active_label', new_idx);
+      this.touch();
     };
   }
 }
