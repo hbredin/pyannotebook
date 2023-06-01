@@ -26,6 +26,7 @@ import ipywidgets
 from .wavesurfer import WavesurferWidget
 from .annotation import AnnotationWidget
 from .labels import LabelsWidget
+from .controlBar import ControlBarWidget
 
 from typing import Optional
 from pyannote.core import Annotation
@@ -75,12 +76,15 @@ class Pyannotebook(ipywidgets.VBox):
         self._wavesurfer = WavesurferWidget(minimap=self.minimap, auto_select=self.auto_select)
         self._annotation = AnnotationWidget()
         self._labels = LabelsWidget()
-        super().__init__([self._wavesurfer, self._labels])
+        self._control_bar = ControlBarWidget()
+        super().__init__([self._wavesurfer, self._labels,self._control_bar])
         ipywidgets.link((self._labels, 'labels'), (self._annotation, 'labels'))
         ipywidgets.link((self._labels, 'labels'), (self._wavesurfer, 'labels'))
         ipywidgets.link((self._annotation, 'regions'), (self._wavesurfer, 'regions'))
         ipywidgets.link((self._labels, 'active_label'), (self._wavesurfer, 'active_label'))
         ipywidgets.link((self._labels, 'colors'), (self._wavesurfer, 'colors'))
+
+        ipywidgets.link((self._wavesurfer, 'playing'), (self._control_bar, 'playing'))
         
         self.pipeline = pipeline
         if audio is not None:

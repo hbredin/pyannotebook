@@ -81,7 +81,6 @@ export class WavesurferView extends DOMWidgetView {
   }
 
   render() {
-
     const plugins = [];
 
     const minimap = this.model.get('minimap');
@@ -493,6 +492,201 @@ export class LabelsView extends DOMWidgetView {
         this.model.set('labels', new_labels);
         this.touch();
       }
+    };
+  }
+}
+
+// add front end of the control bar, based on the label exemple
+export class ControlBarModel extends DOMWidgetModel {
+  defaults() {
+    return {
+      ...super.defaults(),
+      _model_name: ControlBarModel.model_name,
+      _model_module: ControlBarModel.model_module,
+      _model_module_version: ControlBarModel.model_module_version,
+      _view_name: ControlBarModel.view_name,
+      _view_module: ControlBarModel.view_module,
+      _view_module_version: ControlBarModel.view_module_version,
+    };
+  }
+
+  static serializers: ISerializers = {
+    ...DOMWidgetModel.serializers,
+    // Add any extra serializers here
+  };
+
+  static model_name = 'ControlBarModel';
+  static model_module = MODULE_NAME;
+  static model_module_version = MODULE_VERSION;
+  static view_name = 'ControlBarView';
+  static view_module = MODULE_NAME;
+  static view_module_version = MODULE_VERSION;
+}
+
+export class ControlBarView extends DOMWidgetView {
+  container: HTMLDivElement;
+
+  render() {
+    this.container = document.createElement('div');
+    this.el.appendChild(this.container);
+
+    this.update_control_bar();
+    this.model.on('change:control_bar', this.update_control_bar, this);
+  }
+
+  update_control_bar() {
+    const control_bar = this.model.get('playing');
+
+    this.container.textContent = '';
+
+    const play_control_bar = document.createElement('div');
+
+    const fast_backward = document.createElement('button');
+    fast_backward.classList.add('control-bar-button');
+    fast_backward.textContent = '<<';
+    fast_backward.addEventListener('click', this.fast_backward());
+    play_control_bar.appendChild(fast_backward);
+
+    const backward = document.createElement('button');
+    backward.classList.add('control-bar-button');
+    backward.textContent = '<';
+    backward.addEventListener('click', this.backward());
+    play_control_bar.appendChild(backward);
+
+    const play = document.createElement('button');
+    play.classList.add('control-bar-button');
+    if (control_bar === true) {
+      play.textContent = '||';
+    } else {
+      play.textContent = '->';
+    }
+    play.addEventListener('click', this.play());
+    play_control_bar.appendChild(play);
+
+    const forward = document.createElement('button');
+    forward.classList.add('control-bar-button');
+    forward.textContent = '>';
+    forward.addEventListener('click', this.forward());
+    play_control_bar.appendChild(forward);
+
+    const fast_forward = document.createElement('button');
+    fast_forward.classList.add('control-bar-button');
+    fast_forward.textContent = '>>';
+    fast_forward.addEventListener('click', this.fast_forward());
+    play_control_bar.appendChild(fast_forward);
+    play_control_bar.classList.add('sub-control-bar');
+    this.container.appendChild(play_control_bar);
+
+    const zoom_control_bar = document.createElement('div');
+
+    const zoom_in = document.createElement('button');
+    zoom_in.classList.add('control-bar-button');
+    zoom_in.textContent = '+';
+    zoom_in.addEventListener('click', this.zoom_in());
+    zoom_control_bar.appendChild(zoom_in);
+
+    const zoom_out = document.createElement('button');
+    zoom_out.classList.add('control-bar-button');
+    zoom_out.textContent = '-';
+    zoom_out.addEventListener('click', this.zoom_out());
+    zoom_control_bar.appendChild(zoom_out);
+    zoom_control_bar.classList.add('sub-control-bar');
+    this.container.appendChild(zoom_control_bar);
+
+    const region_control_bar = document.createElement('div');
+
+    const insert_region = document.createElement('button');
+    insert_region.classList.add('control-bar-button');
+    insert_region.textContent = 'Insert Region';
+    insert_region.addEventListener('click', this.insert_region());
+    region_control_bar.appendChild(insert_region);
+
+    const cut_region = document.createElement('button');
+    cut_region.classList.add('control-bar-button');
+    cut_region.textContent = 'Cut Region';
+    cut_region.addEventListener('click', this.cut_region());
+    region_control_bar.appendChild(cut_region);
+
+    const delete_region = document.createElement('button');
+    delete_region.classList.add('control-bar-button');
+    delete_region.textContent = 'Delete Region';
+    delete_region.addEventListener('click', this.delete_region());
+
+    region_control_bar.appendChild(delete_region);
+    region_control_bar.classList.add('sub-control-bar');
+
+    this.container.classList.add('control-bar');
+
+    this.container.appendChild(region_control_bar);
+  }
+
+  fast_backward() {
+    return (event: any) => {
+      this.model.set('control_bar', 'fast_backward');
+      this.touch();
+    };
+  }
+
+  backward() {
+    return (event: any) => {
+      this.model.set('control_bar', 'backward');
+      this.touch();
+    };
+  }
+
+  play() {
+    return (event: any) => {
+      this.model.set('control_bar', 'play');
+      this.touch();
+    };
+  }
+
+  forward() {
+    return (event: any) => {
+      this.model.set('control_bar', 'forward');
+      this.touch();
+    };
+  }
+
+  fast_forward() {
+    return (event: any) => {
+      this.model.set('control_bar', 'fast_forward');
+      this.touch();
+    };
+  }
+
+  zoom_in() {
+    return (event: any) => {
+      this.model.set('control_bar', 'zoom_in');
+      this.touch();
+    };
+  }
+
+  zoom_out() {
+    return (event: any) => {
+      this.model.set('control_bar', 'zoom_out');
+      this.touch();
+    };
+  }
+
+  insert_region() {
+    return (event: any) => {
+      this.model.set('control_bar', 'insert_region');
+      this.touch();
+    };
+  }
+
+  cut_region() {
+    return (event: any) => {
+      this.model.set('control_bar', 'cut_region');
+      this.touch();
+    };
+  }
+
+  delete_region() {
+    return (event: any) => {
+      this.model.set('control_bar', 'delete_region');
+      this.touch();
     };
   }
 }

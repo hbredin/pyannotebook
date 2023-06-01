@@ -27,8 +27,8 @@ from itertools import cycle
 from typing import Dict
 
 COLORS = [
-    "#ffd700",
-    "#00ffff",
+    "#1ccf0f",
+    "#06dbdb",
     "#ff00ff",
     "#00ff00",
     "#9932cc",
