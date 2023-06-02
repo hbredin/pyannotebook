@@ -6,6 +6,15 @@ import traitlets
 from ._frontend import module_name, module_version
 from typing import Dict
 
+# liste des "play_command" possibles
+#    "fast_backward"
+#    "backward"
+#    "play"
+#    "forward"
+#    "fast_forward"
+#    "none"
+
+
 class ControlBarWidget(ipywidgets.Widget):
 
     _model_name = traitlets.Unicode("ControlBarModel").tag(sync=True)
@@ -15,13 +24,13 @@ class ControlBarWidget(ipywidgets.Widget):
     _view_module = traitlets.Unicode(module_name).tag(sync=True)
     _view_module_version = traitlets.Unicode(module_version).tag(sync=True)
 
+    play_command = traitlets.Unicode("none").tag(sync=True)
     playing = traitlets.Bool(False).tag(sync=True)
-
 
     def __init__(self):
         super().__init__()
 
 
-    @traitlets.observe("playing")
-    def playing_has_changed(self, change: Boolean):
-        pass
+    @traitlets.observe("play_command")
+    def play_command_has_changed(self, change: Dict):
+        print("play_command_has_changed", change)

@@ -563,7 +563,9 @@ export class ControlBarView extends DOMWidgetView {
   }
 
   update_control_bar() {
-    const control_bar = this.model.get('playing');
+    //const control_play = this.model.get('play_command');
+    const playing = this.model.get('playing');
+    //const control_bar = this.model.get('control_bar');
 
     this.container.textContent = '';
 
@@ -583,11 +585,12 @@ export class ControlBarView extends DOMWidgetView {
 
     const play = document.createElement('button');
     play.classList.add('control-bar-button');
-    if (control_bar === true) {
+    if (playing) {
       play.textContent = '||';
     } else {
       play.textContent = '->';
     }
+
     play.addEventListener('click', this.play());
     play_control_bar.appendChild(play);
 
@@ -650,35 +653,45 @@ export class ControlBarView extends DOMWidgetView {
 
   fast_backward() {
     return (event: any) => {
-      this.model.set('control_bar', 'fast_backward');
+      this.model.set('play_command', 'fast_backward');
+      this.touch();
+      this.model.set('play_command', 'none');
       this.touch();
     };
   }
 
   backward() {
     return (event: any) => {
-      this.model.set('control_bar', 'backward');
+      this.model.set('play_command', 'backward');
+      this.touch();
+      this.model.set('play_command', 'none');
       this.touch();
     };
   }
 
   play() {
     return (event: any) => {
-      this.model.set('control_bar', 'play');
+      this.model.set('play_command', 'play');
+      this.model.set('playing', !this.model.get('playing'));
+      this.model.set('play_command', 'none');
       this.touch();
     };
   }
 
   forward() {
     return (event: any) => {
-      this.model.set('control_bar', 'forward');
+      this.model.set('play_command', 'forward');
+      this.touch();
+      this.model.set('play_command', 'none');
       this.touch();
     };
   }
 
   fast_forward() {
     return (event: any) => {
-      this.model.set('control_bar', 'fast_forward');
+      this.model.set('play_command', 'fast_forward');
+      this.touch();
+      this.model.set('play_command', 'none');
       this.touch();
     };
   }

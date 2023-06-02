@@ -84,8 +84,9 @@ class Pyannotebook(ipywidgets.VBox):
         ipywidgets.link((self._labels, 'active_label'), (self._wavesurfer, 'active_label'))
         ipywidgets.link((self._labels, 'colors'), (self._wavesurfer, 'colors'))
 
+        ipywidgets.link((self._wavesurfer, 'play_command'), (self._control_bar, 'play_command'))
         ipywidgets.link((self._wavesurfer, 'playing'), (self._control_bar, 'playing'))
-        
+
         self.pipeline = pipeline
         if audio is not None:
             self.audio = audio

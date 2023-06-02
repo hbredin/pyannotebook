@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 
+import keyword
 from ipywidgets import DOMWidget
 from ._frontend import module_name, module_version
 import traitlets
@@ -93,6 +94,8 @@ class WavesurferWidget(DOMWidget):
     active_region = traitlets.Unicode("").tag(sync=True)
 
     overlap = traitlets.Dict().tag(sync=True)
+
+    play_command = traitlets.Unicode("none").tag(sync=True)
 
     def __init__(
         self, 
@@ -228,7 +231,7 @@ class WavesurferWidget(DOMWidget):
                 if region["id"] == self.active_region:
                     regions.append({"start": region["start"], "end": region["end"], "id": region["id"], "label": self.active_label})
                 else:
-                    regions.append(region)
+                    regions.append(region) # ligne qui ajoute les regions quand appuye sur touche ?
             self.regions = regions
 
     @traitlets.observe("active_region")
@@ -240,15 +243,46 @@ class WavesurferWidget(DOMWidget):
                 self.active_label = region["label"]
                 break
 
-    def keyboard(self, event):
-
+    def keyboard(self, event, command=None):
+        print("keyboard")
         # for debugging purposes...
         self._last_event = event
 
-        key = event["key"]
-        code = event["code"]
-        shift = event["shiftKey"]
-        alt = event["altKey"]
+        if command is not None:
+            alt = False
+            if command == "play":
+                key = " "
+                print("play")
+            elif command == "backward":
+                key = "ArrowLeft"
+                shift = False
+                print("backward")
+            elif command == "forward":
+                key = "ArrowRight"
+                shift = False
+                print("forward")
+            elif command == "fast_backward":
+                key = "ArrowLeft"
+                shift = True
+                print("fast_backward")
+            elif command == "fast_forward":
+                key = "ArrowRight"
+                shift = True
+                print("fast_forward")
+            elif command == "none":
+                return
+            else:
+                raise ValueError(f"Unsupported command '{command}'")
+
+        else:
+            key = event["key"]
+            code = event["code"]
+            shift = event["shiftKey"]
+            alt = event["altKey"]
+
+        if command is not None:
+            self.play_command = "none"
+            
 
         # [ space ] toggles play/pause status
         if key == " ":
@@ -411,6 +445,10 @@ class WavesurferWidget(DOMWidget):
                 })
                 self.regions = regions
                 self.active_region = region_id
+        
 
 # keyboard shortcut ideas
 # https://support.prodi.gy/t/audio-ui-enhancement-keyboard-shortcuts-and-clickthrough/3412
+    @traitlets.observe("play_command")
+    def _on_play_command(self, change: Dict):
+        self.keyboard(None,change["new"])
