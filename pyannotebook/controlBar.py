@@ -14,6 +14,12 @@ from typing import Dict
 #    "fast_forward"
 #    "none"
 
+# liste des "control_bar" possibles
+#    "insert"
+#    "cut"
+#    "delete"
+#    "none"
+
 
 class ControlBarWidget(ipywidgets.Widget):
 
@@ -26,6 +32,7 @@ class ControlBarWidget(ipywidgets.Widget):
 
     play_command = traitlets.Unicode("none").tag(sync=True)
     playing = traitlets.Bool(False).tag(sync=True)
+    control_bar = traitlets.Unicode("none").tag(sync=True)
 
     def __init__(self):
         super().__init__()
@@ -33,4 +40,8 @@ class ControlBarWidget(ipywidgets.Widget):
 
     @traitlets.observe("play_command")
     def play_command_has_changed(self, change: Dict):
-        print("play_command_has_changed", change)
+        pass
+
+    @traitlets.observe("control_bar")
+    def control_bar_has_changed(self, change: Dict):
+        pass

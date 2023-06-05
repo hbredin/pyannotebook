@@ -700,12 +700,16 @@ export class ControlBarView extends DOMWidgetView {
     return (event: any) => {
       this.model.set('control_bar', 'zoom_in');
       this.touch();
+      this.model.set('control_bar', 'none');
+      this.touch();
     };
   }
 
   zoom_out() {
     return (event: any) => {
       this.model.set('control_bar', 'zoom_out');
+      this.touch();
+      this.model.set('control_bar', 'none');
       this.touch();
     };
   }
@@ -714,6 +718,8 @@ export class ControlBarView extends DOMWidgetView {
     return (event: any) => {
       this.model.set('control_bar', 'insert_region');
       this.touch();
+      this.model.set('control_bar', 'none');
+      this.touch();
     };
   }
 
@@ -721,12 +727,16 @@ export class ControlBarView extends DOMWidgetView {
     return (event: any) => {
       this.model.set('control_bar', 'cut_region');
       this.touch();
+      this.model.set('control_bar', 'none');
+      this.touch();
     };
   }
 
   delete_region() {
     return (event: any) => {
       this.model.set('control_bar', 'delete_region');
+      this.touch();
+      this.model.set('control_bar', 'none');
       this.touch();
     };
   }

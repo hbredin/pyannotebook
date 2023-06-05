@@ -96,6 +96,7 @@ class WavesurferWidget(DOMWidget):
     overlap = traitlets.Dict().tag(sync=True)
 
     play_command = traitlets.Unicode("none").tag(sync=True)
+    control_bar_command = traitlets.Unicode("none").tag(sync=True)
 
     def __init__(
         self, 
@@ -244,7 +245,6 @@ class WavesurferWidget(DOMWidget):
                 break
 
     def keyboard(self, event, command=None):
-        print("keyboard")
         # for debugging purposes...
         self._last_event = event
 
@@ -252,23 +252,27 @@ class WavesurferWidget(DOMWidget):
             alt = False
             if command == "play":
                 key = " "
-                print("play")
             elif command == "backward":
                 key = "ArrowLeft"
                 shift = False
-                print("backward")
             elif command == "forward":
                 key = "ArrowRight"
                 shift = False
-                print("forward")
             elif command == "fast_backward":
                 key = "ArrowLeft"
                 shift = True
-                print("fast_backward")
             elif command == "fast_forward":
                 key = "ArrowRight"
                 shift = True
-                print("fast_forward")
+            elif command == "delete_region":
+                key = "Delete"
+                shift = False
+            elif command == "insert_region":
+                key = "Enter"
+                shift = False
+            elif command == "cut_region":
+                key = "Enter"
+                shift = True
             elif command == "none":
                 return
             else:
@@ -399,7 +403,6 @@ class WavesurferWidget(DOMWidget):
         elif key == "Enter":
 
             if shift:
-
                 # check that a region is selected...
                 if not self.active_region:
                     return
@@ -434,7 +437,6 @@ class WavesurferWidget(DOMWidget):
                 self.active_region = region_id
 
             else:
-
                 regions = list(self.regions)
                 region_id = "".join(random.choices(string.ascii_lowercase, k=20))
                 regions.append({
@@ -451,4 +453,8 @@ class WavesurferWidget(DOMWidget):
 # https://support.prodi.gy/t/audio-ui-enhancement-keyboard-shortcuts-and-clickthrough/3412
     @traitlets.observe("play_command")
     def _on_play_command(self, change: Dict):
+        self.keyboard(None,change["new"])
+
+    @traitlets.observe("control_bar_command")
+    def _on_control_bar(self, change: Dict):
         self.keyboard(None,change["new"])
