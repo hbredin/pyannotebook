@@ -503,21 +503,18 @@ export class LabelsView extends DOMWidgetView {
     return (event: any) => {
       const new_labels = Object();
       const old_labels = this.model.get('labels');
-      const old_colors = this.model.get('colors');
-      const new_idx = Object.keys(old_labels).length;
       for (const i in old_labels) {
         new_labels[i] = old_labels[i];
       }
-      new_labels[new_idx] = 'New Label';
+      //use the last label letter+1 as new label
+      const new_idx = String.fromCharCode(
+        Math.max.apply(
+          null,
+          Object.keys(new_labels).map((x) => x.charCodeAt(0))
+        ) + 1
+      );
+      new_labels[new_idx] = '';
       this.model.set('labels', new_labels);
-
-      const new_colors = Object();
-      for (const i in old_colors) {
-        new_colors[i] = old_colors[i];
-      }
-      new_colors[new_idx] = '#000000';
-      this.model.set('colors', new_colors);
-
       this.model.set('active_label', new_idx);
       this.touch();
     };
