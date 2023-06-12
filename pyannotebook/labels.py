@@ -26,8 +26,20 @@ from ._frontend import module_name, module_version
 from itertools import cycle
 from typing import Dict
 
+
+
+# color blind friendly palette from https://venngage.com/tools/accessible-color-palette-generator around #FF00FF color
 COLORS = [
-    "#1ccf0f",
+    "#0560ba",
+    "#0087e6",
+    "#ff00ff", 
+    "#f5ff00", 
+    "#cfcb00",
+]
+
+""" Alternative color choices
+COLORS = [
+    "#0560ba",
     "#06dbdb",
     "#ff00ff",
     "#00ff00",
@@ -35,7 +47,15 @@ COLORS = [
     "#00bfff",
     "#ff7f50",
     "#66cdaa",
-]
+] 
+COLORS = [
+    "#5771EB",
+    "#EA604F",
+    "#4BCDEB",
+    "#EBBD34",
+    "#2FEB8F",
+]"""
+
 
 class LabelsWidget(ipywidgets.Widget):
     """Labels widget
