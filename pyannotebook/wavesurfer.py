@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 
+
 from ipywidgets import DOMWidget
 from ._frontend import module_name, module_version
 import traitlets
@@ -93,6 +94,9 @@ class WavesurferWidget(DOMWidget):
     active_region = traitlets.Unicode("").tag(sync=True)
 
     overlap = traitlets.Dict().tag(sync=True)
+
+    play_command = traitlets.Unicode("none").tag(sync=True)
+    control_bar_command = traitlets.Unicode("none").tag(sync=True)
 
     def __init__(
         self, 
@@ -228,7 +232,7 @@ class WavesurferWidget(DOMWidget):
                 if region["id"] == self.active_region:
                     regions.append({"start": region["start"], "end": region["end"], "id": region["id"], "label": self.active_label})
                 else:
-                    regions.append(region)
+                    regions.append(region) # ligne qui ajoute les regions quand appuye sur touche ?
             self.regions = regions
 
     @traitlets.observe("active_region")
@@ -241,7 +245,6 @@ class WavesurferWidget(DOMWidget):
                 break
 
     def keyboard(self, event):
-
         # for debugging purposes...
         self._last_event = event
 
@@ -249,6 +252,7 @@ class WavesurferWidget(DOMWidget):
         code = event["code"]
         shift = event["shiftKey"]
         alt = event["altKey"]
+            
 
         # [ space ] toggles play/pause status
         if key == " ":
@@ -365,7 +369,6 @@ class WavesurferWidget(DOMWidget):
         elif key == "Enter":
 
             if shift:
-
                 # check that a region is selected...
                 if not self.active_region:
                     return
@@ -400,7 +403,6 @@ class WavesurferWidget(DOMWidget):
                 self.active_region = region_id
 
             else:
-
                 regions = list(self.regions)
                 region_id = "".join(random.choices(string.ascii_lowercase, k=20))
                 regions.append({
@@ -411,6 +413,139 @@ class WavesurferWidget(DOMWidget):
                 })
                 self.regions = regions
                 self.active_region = region_id
+        
 
 # keyboard shortcut ideas
 # https://support.prodi.gy/t/audio-ui-enhancement-keyboard-shortcuts-and-clickthrough/3412
+    @traitlets.observe("play_command")
+    def _on_play_command(self, change: Dict):
+        # define direction and speed
+        command = change["new"]
+
+        if command == "play":
+                self.playing = not self.playing
+
+        elif command == "backward":
+                direction = -1
+                speed = False
+
+        elif command == "forward":
+                direction = 1
+                speed = False
+
+        elif command == "fast_backward":
+                direction = -1
+                speed = True
+
+        elif command == "fast_forward":
+                direction = 1
+                speed = True
+
+        elif command == "none":
+                return
+            
+        else:
+                raise ValueError(f"Unsupported play command '{change['new']}'")
+        
+        # apply move, with special handling for active region
+        delta = self.precision[speed] * direction
+            
+        if self.active_region:
+            self.playing = False
+            regions = list()
+            for region in self.regions:
+                if region["id"] == self.active_region:
+                    if speed:
+                        start = region["start"]
+                        end = region["end"] + delta
+                        if self.t > end:
+                            self.t = end - 1.0
+                    else:
+                        start = region["start"] + delta
+                        end = region["end"]
+                        self.t = start
+                    regions.append({"start": start, "end": end, "id": region["id"], "label": region["label"]})
+                else:
+                    regions.append(region)
+            self.regions = regions
+            self.playing = True
+        else:
+            self.t += delta
+
+
+    @traitlets.observe("control_bar_command")
+    def _on_control_bar(self, change: Dict):
+        
+        command = change["new"]
+        
+        if command ==  "delete_region":
+                if not self.active_region:
+                    return
+                regions = sorted(self.regions, key=lambda r: (r["start"], r["end"]))
+                region_ids = [region["id"] for region in regions]
+                active_region = regions[
+                    (region_ids.index(self.active_region) + 1) % len(region_ids)
+                ]["id"]
+
+                regions = list(filter(lambda r: r["id"] != self.active_region, self.regions))
+                if regions:
+                    self.active_region = active_region
+                else:
+                    self.active_region = ""
+                self.regions = regions
+
+
+        elif command == "insert_region":
+
+                regions = list(self.regions)
+                region_id = "".join(random.choices(string.ascii_lowercase, k=20))
+                regions.append({
+                    "start": self.t,
+                    "end": self.t + self.precision[1],
+                    "id": region_id,
+                    "label": self.active_label
+                })
+                self.regions = regions
+                self.active_region = region_id 
+
+        elif command == "cut_region":
+                 # check that a region is selected...
+                if not self.active_region:
+                    return
+
+                other_regions, selected_region = partition(lambda r: r["id"] == self.active_region, self.regions)
+                other_regions = list(other_regions)
+                selected_region = list(selected_region)[0]
+
+                # check that selected region contains current time
+                if self.t < selected_region["start"] or self.t > selected_region["end"]:
+                    return
+            
+                # split selected region into first and second halves  
+                first_half = {
+                    "start": selected_region["start"],
+                    "end": self.t,
+                    "id": selected_region["id"],
+                    "label": selected_region["label"]
+                }
+                region_id = "".join(random.choices(string.ascii_lowercase, k=20))
+                second_half = {
+                    "start": self.t,
+                    "end": selected_region["end"],
+                    "id": region_id,
+                    "label": selected_region["label"]
+                }
+                
+                # append to halves to list of regions
+                self.regions = other_regions + [first_half, second_half]
+
+                # selects second half
+                self.active_region = region_id
+
+        elif command == "none":
+                return
+            
+        else:
+                raise ValueError(f"Unsupported control command '{change['new']}'")
+            
+        self.play_command = "none"

@@ -153,3 +153,12 @@ pyannotebook/nbextension/index.*
 
 # Packed lab extensions
 pyannotebook/labextension
+
+# yarn
+.yarn/*
+.yarnrc.yml
+yarn.lock
+
+package-lock.json
+
+
