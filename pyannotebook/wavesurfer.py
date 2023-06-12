@@ -420,31 +420,33 @@ class WavesurferWidget(DOMWidget):
     @traitlets.observe("play_command")
     def _on_play_command(self, change: Dict):
         # define direction and speed
-        match change["new"]:
-            case "play":
+        command = change["new"]
+
+        if command == "play":
                 self.playing = not self.playing
 
-            case "backward":
+        elif command == "backward":
                 direction = -1
                 speed = False
 
-            case "forward":
+        elif command == "forward":
                 direction = 1
                 speed = False
 
-            case "fast_backward":
+        elif command == "fast_backward":
                 direction = -1
                 speed = True
 
-            case "fast_forward":
+        elif command == "fast_forward":
                 direction = 1
                 speed = True
 
-            case "none":
+        elif command == "none":
                 return
             
-            case _:
+        else:
                 raise ValueError(f"Unsupported play command '{change['new']}'")
+        
         # apply move, with special handling for active region
         delta = self.precision[speed] * direction
             
@@ -474,9 +476,9 @@ class WavesurferWidget(DOMWidget):
     @traitlets.observe("control_bar_command")
     def _on_control_bar(self, change: Dict):
         
-        match change["new"]:
+        command = change["new"]
         
-            case "delete_region":
+        if command ==  "delete_region":
                 if not self.active_region:
                     return
                 regions = sorted(self.regions, key=lambda r: (r["start"], r["end"]))
@@ -493,7 +495,7 @@ class WavesurferWidget(DOMWidget):
                 self.regions = regions
 
 
-            case "insert_region":
+        elif command == "insert_region":
 
                 regions = list(self.regions)
                 region_id = "".join(random.choices(string.ascii_lowercase, k=20))
@@ -506,7 +508,7 @@ class WavesurferWidget(DOMWidget):
                 self.regions = regions
                 self.active_region = region_id 
 
-            case "cut_region":
+        elif command == "cut_region":
                  # check that a region is selected...
                 if not self.active_region:
                     return
@@ -540,10 +542,10 @@ class WavesurferWidget(DOMWidget):
                 # selects second half
                 self.active_region = region_id
 
-            case "none":
+        elif command == "none":
                 return
             
-            case _:
+        else:
                 raise ValueError(f"Unsupported control command '{change['new']}'")
             
         self.play_command = "none"
